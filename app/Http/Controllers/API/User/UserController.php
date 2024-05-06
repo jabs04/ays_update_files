@@ -333,7 +333,22 @@ class UserController extends Controller
             return comman_message_response(__('messages.no_record_found'),400);
         }
 
-        $user->fill($request->all())->update();
+        $data=$request->all();
+
+        $why_choose_me=[
+
+            'why_choose_me_title'=>$request->why_choose_me_title,
+            'why_choose_me_reason' => isset($request->why_choose_me_reason) && is_string($request->why_choose_me_reason)
+            ? array_filter(json_decode($request->why_choose_me_reason), function ($value) {
+                return $value !== null;
+            })
+            : null,
+
+        ];
+
+        $data['why_choose_me']=($why_choose_me);
+
+        $user->fill($data)->update();
 
         if(isset($request->profile_image) && $request->profile_image != null ) {
             $user->clearMediaCollection('profile_image');
