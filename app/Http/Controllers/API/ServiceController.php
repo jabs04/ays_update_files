@@ -29,6 +29,8 @@ class ServiceController extends Controller
 
         $service = Service::where('service_type','service')->with(['providers','category','serviceRating'])->orderBy('created_at','desc');
 
+    
+
         $category = Category::onlyTrashed()->get();
         $category = $category->pluck('id');
         $service = $service->whereNotIn('category_id',$category);
@@ -61,12 +63,18 @@ class ServiceController extends Controller
         if($request->has('is_discount')){
             $service->where('discount','>',0)->orderBy('discount','desc');
         }
-        if($request->has('is_rating') && $request->is_rating != ''){
-            $service->whereHas('serviceRating', function($q) use ($request) {
-                $q->select('service_id',\DB::raw('round(AVG(rating),0) as total_rating'))->groupBy('service_id');
+        if($request->has('is_rating') && $request->is_rating != '') {
+            $isRating = (int) $request->is_rating;
+        
+            $service->whereHas('serviceRating', function($q) use ($isRating) {
+                $q->select('service_id', \DB::raw('round(AVG(rating), 1) as total_rating'))
+                  ->groupBy('service_id')
+                  ->havingRaw('total_rating >= ? AND total_rating < ?', [$isRating, $isRating + 1]);
                 return $q;
             });
         }
+
+
         if($request->has('is_price_min') && $request->is_price_min != '' || $request->has('is_price_max') && $request->is_price_max != ''){
             $service->whereBetween('price', [$request->is_price_min, $request->is_price_max]); 
         }

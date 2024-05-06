@@ -209,7 +209,6 @@ class DashboardController extends Controller
            'app_download' => !empty($app_download) ? $app_download : null,
            'upcomming_booking' => $upcomming_booking,
            'is_advanced_payment_allowed' =>$is_advanced_allowed,
-           //'is_digital_service_allowed' =>$is_digital_service_allowed,
            'blogs' => $blogs,
            'enable_user_wallet' => $enable_user_wallet
         ];
@@ -497,9 +496,9 @@ class DashboardController extends Controller
  
          return comman_custom_response($response);
     }
-    public function configurations(Request $request){
+    public function configurations(Request $request){  
         
-        $user = User::find(auth()->user()->id);
+      $user = User::find(auth()->user()->id);
 
         $configurations = Setting::with('country')->get();
 
@@ -523,6 +522,8 @@ class DashboardController extends Controller
 
         $payment_settings = PaymentGatewayResource::collection($payment_settings);
 
+        $other_setting = Setting::where('type','OTHER_SETTING')->where('key','OTHER_SETTING')->first();
+
         $general_settings = AppSetting::first();
 
         $privacy_policy = Setting::where('type','privacy_policy')->where('key','privacy_policy')->first();
@@ -542,33 +543,49 @@ class DashboardController extends Controller
 
         }
 
-        $is_advanced_allowed = Setting::where('type','=','ADVANCED_PAYMENT_SETTING')->first();
-        if($is_advanced_allowed !== null){
-            $is_advanced_allowed = $is_advanced_allowed->value;
+        $other_data = json_decode($other_setting->value);
+        if($other_data !== null){
+            $is_advanced_allowed = $other_data->advanced_payment_setting;
         }
 
-        $enable_user_wallet = Setting::where('type', '=', 'USER_WALLET_SETTING')->first();
-        if($enable_user_wallet !== null){
-            $enable_user_wallet = $enable_user_wallet->value;
+        if($other_data !== null){
+            $enable_user_wallet = $other_data->wallet;
         }
         $general_settings = AppSetting::getAppSettings()->first();
         $general_settings->site_logo = getSingleMedia(settingSession('get'),'site_logo',null);
-        $response = [
-            'configurations' => $configurations,
-            'notification_unread_count' => $notification,
-            'subscription'  => $active_plan,
-            'is_subscribed' => is_subscribed_user($user->id),
-            'payment_settings' => $payment_settings,
-            'helpline_number'=> $general_settings->helpline_number,
-            'inquiry_email' => $general_settings->inquriy_email,
-            'privacy_policy' => $privacy_policy,
-            'term_conditions' => $term_conditions,
-            'language_option' => $language_array,
-            'app_download' => !empty($app_download) ? $app_download : null,
-            'is_advanced_payment_allowed' =>$is_advanced_allowed,
-            'enable_user_wallet' => $enable_user_wallet,
-            'general_settings' => $general_settings
-        ];
+
+        if($request->has('is_authenticated') && $request->is_authenticated ==0){
+
+            $response = [   
+            
+                'other_settings'=> $other_setting ? json_decode($other_setting->value) : null,
+            
+               ];
+
+         }else{
+
+            $response = [
+                'configurations' => $configurations,
+                'notification_unread_count' => $notification,
+                'subscription'  => $active_plan,
+                'is_subscribed' => is_subscribed_user($user->id),
+                'payment_settings' => $payment_settings,
+                'other_settings'=>$other_setting ? json_decode($other_setting->value) : null,
+                'helpline_number'=> $general_settings->helpline_number,
+                'inquiry_email' => $general_settings->inquriy_email,
+                'privacy_policy' => $privacy_policy,
+                'term_conditions' => $term_conditions,
+                'language_option' => $language_array,
+                'app_download' => !empty($app_download) ? $app_download : null,
+                'is_advanced_payment_allowed' =>$is_advanced_allowed,
+                'enable_user_wallet' => $enable_user_wallet,
+                'general_settings' => $general_settings
+            ];
+
+        }
+       
+
+       
         return comman_custom_response($response);
     }
 }
