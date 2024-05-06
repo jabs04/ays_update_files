@@ -106,7 +106,8 @@
                             <div class="form-group col-md-4">
                                     {{ Form::label('visit_type', __('messages.visit_type').' ',['class'=>'form-control-label'],false) }}
                                     <br />
-                                    {{ Form::select('visit_type',['on_site' => __('messages.on_site') , 'online' => __('messages.online') ],old('visit_type'),[ 'id' => 'visit_type' ,'class' =>'form-control select2js','required']) }}
+                                    {{ Form::select('visit_type',$visittype,old('visit_type'),[ 'id' => 'visit_type' ,'class' =>'form-control select2js','required']) }}
+                                    <!-- {{ Form::select('visit_type',['on_site' => __('messages.on_site') , 'online' => __('messages.online') ],old('visit_type'),[ 'id' => 'visit_type' ,'class' =>'form-control select2js','required']) }} -->
                                 </div>
 
                             <div class="form-group col-md-4">
