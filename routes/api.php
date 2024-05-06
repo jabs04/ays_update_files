@@ -35,6 +35,10 @@ Route::post('city-list',[ API\CommanController::class, 'getCityList' ]);
 Route::get('search-list', [ API\CommanController::class, 'getSearchList' ] );
 Route::get('slider-list',[ API\SliderController::class, 'getSliderList' ]);
 Route::get('top-rated-service',[ API\ServiceController::class, 'getTopRatedService' ]);
+Route::get('coupon-list',[ API\CouponController::class, 'getCouponList' ]);
+Route::get('configurations', [ API\DashboardController::class, "configurations"]);
+
+
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
@@ -160,6 +164,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     
 
 
-    Route::get('configurations', [ API\DashboardController::class, "configurations"]);
+  
 
 });

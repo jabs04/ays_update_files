@@ -146,7 +146,7 @@ Route::get('lang/{locale}', [HomeController::class,'lang'])->name('switch-langua
 Route::group(['middleware' => ['auth', 'verified']], function()
 {
     Route::get('/home', [HomeController::class, 'index'])->name('home');
-    Route::get('home-upline-data',[HomeController::class,'upline_data'])->name('home.upline_data');
+Route::get('home-upline-data',[HomeController::class,'upline_data'])->name('home.upline_data');
     Route::get('transaction-history',[HomeController::class,'history_index'])->name('history_index');
     Route::get('transaction-history',[HomeController::class,'transaction_history'])->name('transaction_history');
     Route::get('neo-tag-history',[HomeController::class,'neo_tag_history'])->name('neo_tag_history');
@@ -262,7 +262,7 @@ Route::group(['middleware' => ['auth', 'verified']], function()
         Route::post('booking-bulk-action', [BookingController::class, 'bulk_action'])->name('booking.bulk-action');
         Route::post('booking-status-update',[ BookingController::class,'updateStatus'])->name('bookingStatus.update');
         Route::post('booking-save', [ App\Http\Controllers\BookingController::class, 'store' ] )->name('booking.save');
-        
+
         Route::post('ajax-add-neo-tag',[BookingController::class,'add_neo_tag'])->name('booking.add_neo_tag');
         Route::get('ajax-neo-tag',[BookingController::class,'search_neo'])->name('booking.search_neo');
         Route::get('ajax-neo-search',[BookingController::class,'sp_search_neo'])->name('booking.sp_search_neo');
@@ -315,10 +315,10 @@ Route::group(['middleware' => ['auth', 'verified']], function()
     Route::group(['middleware' => ['permission:user list']], function () {
         Route::resource('user', CustomerController::class);
         Route::get('user/list/{status?}', [CustomerController::class,'index'])->name('user.all');
-        Route::get('user/neopreneur/{status?}',[CustomerController::class,'neo_list'])->name('user.neo');
+Route::get('user/neopreneur/{status?}',[CustomerController::class,'neo_list'])->name('user.neo');
         Route::get('user/neo/create',[CustomerController::class,'create_neo'])->name('user.create_neo');
         Route::get('user-index-data',[CustomerController::class,'index_data'])->name('user.index_data');
-        Route::get('user-index-neodata',[CustomerController::class,'index_neodata'])->name('user.index_neodata');
+Route::get('user-index-neodata',[CustomerController::class,'index_neodata'])->name('user.index_neodata');
         
         Route::get('user-neo-data',[CustomerController::class,'neo_data'])->name('user.neo_data');
         Route::post('user/create/neo', [CustomerController::class, 'neo_store'])->name('user.neo_store');
@@ -452,6 +452,7 @@ Route::group(['middleware' => ['auth', 'verified']], function()
     Route::post('send-push-notification', [ SettingController::class , 'sendPushNotification'])->name('sendPushNotification');
     Route::post('save-earning-setting', [ SettingController::class , 'saveEarningTypeSetting'])->name('saveEarningTypeSetting');
     Route::post('advance-earning-setting' , [ SettingController::class , 'advanceEarningSetting'])->name('advanceEarningSetting');
+    Route::post('other-setting' , [ SettingController::class , 'otherSetting'])->name('otherSetting');
 
     Route::post('enable-user-wallet', [SettingController::class, 'enableUserWallet'])->name('enableUserWallet');
 
