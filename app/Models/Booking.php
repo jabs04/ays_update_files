@@ -86,6 +86,10 @@ class Booking extends Model
         return $this->belongsTo(BookingCouponMapping::class,'id','booking_id');
     }
 
+    public function bookingAddonService(){
+        return $this->hasMany(BookingServiceAddonMapping::class,'booking_id','id')->with('AddonserviceDetails');
+    }
+
     public function handymanAdded(){
         return $this->hasMany(BookingHandymanMapping::class,'booking_id','id')->with(['handyman']);
     }
@@ -268,5 +272,15 @@ class Booking extends Model
        $grandTotalAmount =  $this->getSubTotalValue()  + $this->getTaxesValue() + $this->getExtraChargeValue();
 
        return $grandTotalAmount;
+    }
+    public function getServiceAddonValue(): float
+    {
+        $addonPrice = 0;
+        if (!empty($this->bookingAddonService)) {
+            foreach ($this->bookingAddonService as $charge) {
+                $addonPrice += $charge['price'];
+            }
+        }
+        return $addonPrice;
     }
 }

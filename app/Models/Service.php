@@ -15,7 +15,7 @@ class Service extends Model implements  HasMedia
     protected $table = 'services';
     protected $fillable = [
         'name', 'category_id', 'provider_id' , 'type' , 'is_slot','discount' , 'duration' ,'description', 
-        'is_featured', 'status' , 'price' , 'added_by','subcategory_id','service_type',
+        'is_featured', 'status' , 'price' , 'added_by','subcategory_id','service_type','visit_type',
         'is_enable_advance_payment','advance_payment_amount'
     ];
 
@@ -29,6 +29,7 @@ class Service extends Model implements  HasMedia
         'is_featured'               => 'integer',
         'added_by'                  => 'integer',
         'is_slot'                   => 'integer',
+        //'digital_service'           => 'integer',
         'is_enable_advance_payment' => 'integer',
         'advance_payment_amount'    => 'double',
     ];
@@ -135,5 +136,8 @@ class Service extends Model implements  HasMedia
     }
     public function postJobService(){
         return $this->hasMany(PostJobServiceMapping::class, 'service_id', 'id');
+    }
+    public function serviceAddon(){
+        return $this->hasMany(ServiceAddon::class, 'service_id','id');
     }
 }

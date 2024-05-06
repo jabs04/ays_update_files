@@ -26,4 +26,7 @@ class BookingPackageMapping extends Model
     public function package(){
         return $this->belongsTo(ServicePackage::class, 'service_package_id','id');
     }
+    public function bookings() {
+        return $this->belongsTo(Booking::class, 'booking_id','id');
+    }
 }
