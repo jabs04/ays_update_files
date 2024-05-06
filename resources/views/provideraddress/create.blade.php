@@ -32,27 +32,17 @@
                                     </div>
                                 @endif
                               
-                                @if(isset($provideraddress->id))
-                                    <div id="latFields" class="form-group col-md-4">
-                                        {{ Form::label('latitude',__('messages.latitude').' <span class="text-danger">*</span>',['class'=>'form-control-label'], false ) }}
-                                        {{ Form::number('latitude',old('latitude'), ['id' => 'latitude', 'placeholder' => '00.0000','class' =>'form-control','required','step'=>'any']) }}
-                                    </div>
+                                
+                                <div id="latFields" class="form-group col-md-4">
+                                    {{ Form::label('latitude',__('messages.latitude').' ',['class'=>'form-control-label'], false ) }}
+                                    {{ Form::number('latitude',old('latitude'), ['id' => 'latitude', 'placeholder' => '00.0000','class' =>'form-control','step'=>'any']) }}
+                                </div>
 
-                                    <div id="lngFields" class="form-group col-md-4">
-                                        {{ Form::label('longitude',__('messages.longitude').' <span class="text-danger">*</span>',['class'=>'form-control-label'], false ) }}
-                                        {{ Form::number('longitude',old('longitude'), ['id' => 'longitude', 'placeholder' => '00.0000','class' =>'form-control','required','step'=>'any']) }}
-                                    </div>
-                                @else
-                                    <div id="latFields" class="form-group col-md-4 d-none">
-                                    {{ Form::label('latitude',__('messages.latitude').' <span class="text-danger">*</span>',['class'=>'form-control-label'], false ) }}
-                                    {{ Form::number('latitude',old('latitude'), ['id' => 'latitude', 'placeholder' => '00.0000','class' =>'form-control','required','step'=>'any']) }}
-                                    </div>
+                                <div id="lngFields" class="form-group col-md-4">
+                                    {{ Form::label('longitude',__('messages.longitude').' ',['class'=>'form-control-label'], false ) }}
+                                    {{ Form::number('longitude',old('longitude'), ['id' => 'longitude', 'placeholder' => '00.0000','class' =>'form-control','step'=>'any']) }}
+                                </div>
 
-                                    <div id="lngFields" class="form-group col-md-4 d-none">
-                                        {{ Form::label('longitude',__('messages.longitude').' <span class="text-danger">*</span>',['class'=>'form-control-label'], false ) }}
-                                        {{ Form::number('longitude',old('longitude'), ['id' => 'longitude', 'placeholder' => '00.0000','class' =>'form-control','required','step'=>'any']) }}
-                                    </div>
-                                @endif
                                 <div class="form-group col-md-4">
                                     {{ Form::label('status',__('messages.status').' <span class="text-danger">*</span>',['class'=>'form-control-label'],false) }}
                                     {{ Form::select('status',['1' => __('messages.active') , '0' => __('messages.inactive') ],old('status'),[ 'id' => 'role' ,'class' =>'form-control select2js','required']) }}
@@ -86,13 +76,9 @@
                     var latitude = response.latitude;
                     var longitude = response.longitude;
                     if (latitude != null && longitude != null) {
-                        $('#latFields').removeClass('d-none');
-                        $('#lngFields').removeClass('d-none');
+                       
                         $('#latitude').val(latitude);
                         $('#longitude').val(longitude);
-                    }else{
-                        $('#latFields').addClass('d-none');
-                        $('#lngFields').addClass('d-none');
                     }
                 },
                 error: function(error) {

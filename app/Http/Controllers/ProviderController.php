@@ -47,7 +47,7 @@ class ProviderController extends Controller
     {
         $query = User::query();
         $filter = $request->filter;
-      
+       
         if (isset($filter)) {
             if (isset($filter['column_status'])) {
                 $query->where('status', $filter['column_status']);
@@ -64,9 +64,9 @@ class ProviderController extends Controller
         }
         if($request->list_status == 'subscribe'){
             $query = $query->where('status',1)->where('is_subscribe',1);
-        }
-     
-          return $datatable->eloquent($query)
+        } 
+        
+        return $datatable->eloquent($query)
             ->addColumn('check', function ($row) {
                 return '<input type="checkbox" class="form-check-input select-table-row"  id="datatable-row-'.$row->id.'"  name="datatable_ids[]" value="'.$row->id.'" data-type="user" onclick="dataTableRowCheck('.$row->id.',this)">';
             })
@@ -80,7 +80,7 @@ class ProviderController extends Controller
                 }else{
                     $status = '<span class="badge badge-active">'.__('messages.active').'</span>';
                 }
-                
+
                 return $status;
             })
             ->editColumn('providertype_id', function($query) {
@@ -227,10 +227,7 @@ class ProviderController extends Controller
             })
             ->addIndexColumn()
             ->rawColumns(['check','display_name','action','status'])
-            ->toJson();  
-        
-        // return $datatable->eloquent($query)
-        
+            ->toJson();
     }
 
     /* bulck action method */
@@ -335,7 +332,7 @@ class ProviderController extends Controller
             $data['sp_neo_id'] = isset($data['neo_id']) ? $data['neo_id'] : NULL;
             $data['sp_upline_id'] = isset($data['upline_neo_id']) ? $data['upline_neo_id'] : NULL;
             $user->fill($data)->update();
-            if($user){
+        if($user){
                 if($data['spNeoUpline'] != NULL){
                     $updateupline = DB::table('users')->where('referal_code', $data['neo'])->update(['upline' => $data['spNeoUpline']]);
                 }
@@ -415,7 +412,7 @@ class ProviderController extends Controller
             'providerAlreadyWithdrawAmt' => $providerPayout,
             'pendWithdrwan' => isset($providerTotEarning->provider_booking_sum_total_amount) ? $providerTotEarning->provider_booking_sum_total_amount : 0 - $providerPayout,
         ];
-        
+
         $pageTitle = __('messages.view_form_title', ['form' => __('messages.provider')]);
         return view('provider.view', compact('pageTitle', 'providerdata', 'auth_user', 'data','providerTotEarning','providerPayout','providerData','usid'));
     }
@@ -623,7 +620,11 @@ class ProviderController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return redirect()->route('provider.changepassword',['id' => $user->id])->with('errors', $validator->errors());
+            if ($validator->errors()->has('password')) {
+                $message = __('messages.confirmed',['name' => __('messages.password')]);
+                return redirect()->route('provider.changepassword', ['id' => $user->id])->with('error', $message);
+            }
+            return redirect()->route('provider.changepassword', ['id' => $user->id])->with('errors', $validator->errors());
         }
 
         $hashedPassword = $user->password;

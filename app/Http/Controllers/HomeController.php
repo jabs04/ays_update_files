@@ -20,6 +20,7 @@ use App\Models\Setting;
 use App\Models\ProviderPayout;
 use App\Models\HandymanPayout;
 use App\Models\ServiceFaq;
+use App\Models\ServiceAddon;
 use App\Models\AppDownload;
 use Yajra\DataTables\DataTables;
 use App\http\Requests\Auth\LoginRequest;
@@ -188,8 +189,8 @@ class HomeController extends Controller
             $data['depot_total_booking']     = $depot_total_booking;
             $data['depot_totaL_sp']          = $total_service_provider;
             $data['depot_area']              = $user->area;
-            
-            
+
+          
         }
 
         if (auth()->user()->hasAnyRole(['admin', 'demo_admin'])) {
@@ -211,11 +212,12 @@ class HomeController extends Controller
     }
 
     /**
+     * Admin Dashboard
      *
      * @param $data
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-     public function booking_view(Request $request)
+public function booking_view(Request $request)
     {
         $filter = [
             'status' => $request->status,
@@ -972,7 +974,7 @@ class HomeController extends Controller
         }
         return view('dashboard.dashboard', compact('data', 'show'));
     }
-    public function historyDashboard($data)
+public function historyDashboard($data)
     {
         $show = "false";
         $dashboard_setting = Setting::where('type', 'dashboard_setting')->first();
@@ -1003,7 +1005,7 @@ class HomeController extends Controller
         }
         return view('dashboard.provider-dashboard', compact('data', 'show'));
     }
-    public function depotDashboard($data)
+public function depotDashboard($data)
     {
         $wallet = DB::table('wallets')->where('user_id', $data['wallet_id'])->first();
        
@@ -1023,7 +1025,7 @@ class HomeController extends Controller
     {
         return view('dashboard.user-dashboard', compact('data'));
     }
-    public function encashment_index(Request $request)
+public function encashment_index(Request $request)
      {
        $user = auth()->user();
        $data['wallet_id'] = $user->id;
@@ -1145,11 +1147,16 @@ class HomeController extends Controller
                 $blog->status = $request->status;
                 $blog->save();
                 break;
-                case 'servicepackage_status':
-                    $servicepackage = \App\Models\ServicePackage::find($request->id);
-                    $servicepackage->status = $request->status;
-                    $servicepackage->save();
-                    break;
+            case 'servicepackage_status':
+                $servicepackage = \App\Models\ServicePackage::find($request->id);
+                $servicepackage->status = $request->status;
+                $servicepackage->save();
+                break;
+            case 'serviceaddon_status':
+                $serviceaddon = \App\Models\ServiceAddon::find($request->id);
+                $serviceaddon->status = $request->status;
+                $serviceaddon->save();
+                break;
             default:
                 $message = 'error';
                 break;
@@ -1515,6 +1522,10 @@ class HomeController extends Controller
                 $media = Media::find($request->id);
                 $media->delete();
                 $message = __('messages.msg_removed', ['name' => __('messages.attachments')]);
+                break;
+            case 'serviceaddon_image':
+                $data = ServiceAddon::find($request->id);
+                $message = __('messages.msg_removed', ['name' => __('messages.service_addon')]);
                 break;
             default:
                 $data = AppSetting::find($request->id);

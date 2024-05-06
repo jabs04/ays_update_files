@@ -8,16 +8,12 @@
         <!-- @if($auth_user->can('user view'))
         <a class="mr-2" href="{{ route('user.show',$user->id) }}"><i class="far fa-eye text-secondary"></i></a>
         @endif -->
-        <!--@if($auth_user->can('user edit'))-->
-        <!--<a class="mr-2" href="{{ route('user.create',['id' => $user->id]) }}" title="{{ __('messages.update_form_title',['form' => __('messages.user') ]) }}"><i class="fas fa-pen text-primary "></i></a>-->
-        <!--@endif-->
         @if($auth_user->can('user edit'))
             @if($user->user_type == "Neopreneur")
                 <a class="mr-2" href="{{ route('user.create_neo',['id' => $user->id]) }}" title="{{ __('messages.update_form_title',['form' => __('messages.user') ]) }}"><i class="fas fa-pen text-primary "></i></a>
             @else 
                 <a class="mr-2" href="{{ route('user.create',['id' => $user->id]) }}" title="{{ __('messages.update_form_title',['form' => __('messages.user') ]) }}"><i class="fas fa-pen text-primary "></i></a>
             @endif
-            
         @endif
         @if($auth_user->can('user delete'))
         <a class="mr-2 text-danger" href="{{ route('user.destroy', $user->id) }}" data--submit="user{{$user->id}}" 

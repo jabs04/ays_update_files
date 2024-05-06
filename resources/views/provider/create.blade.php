@@ -234,7 +234,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         {{ Form::submit( __('messages.save'), ['class'=>'btn btn-md btn-primary float-right']) }}
                         {{ Form::close() }}
                     </div>

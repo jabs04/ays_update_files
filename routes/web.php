@@ -39,6 +39,7 @@ use App\Http\Controllers\BookingRatingController;
 use App\Http\Controllers\HandymanRatingController;
 use App\Http\Controllers\UserServiceListController;
 use App\Http\Controllers\ProviderSlotController;
+use App\Http\Controllers\ServiceAddonController;
 use App\Models\EarningsNeo;
 use App\Models\Booking;
 use Illuminate\Support\Facades\DB;
@@ -60,8 +61,6 @@ Route::get('/linkstorage', function () {
     Artisan::call('storage:link');
     echo "oks na";
 });
-
-
 Route::get('/looparea', function () {
     $areas = array(
         '4198' => array(
@@ -96,38 +95,33 @@ Route::get('/looparea', function () {
     }
    echo " done/";
 });
-
-
-
-
 Route::get('/testt', function () {
-$iPod    = stripos($_SERVER['HTTP_USER_AGENT'],"iPod");
-$iPhone  = stripos($_SERVER['HTTP_USER_AGENT'],"iPhone");
-$iPad    = stripos($_SERVER['HTTP_USER_AGENT'],"iPad");
-$Android = stripos($_SERVER['HTTP_USER_AGENT'],"Android");
-
-
-//do something with this information
-if( $iPod || $iPhone ){
-    //browser reported as an iPhone/iPod touch -- do something here
-    $string = "Location: <<your itunes app link>>";
-    header($string);
-    die();
-}else if($iPad){
-    //browser reported as an iPad -- do something here
-    $string = "Location: <<your itunes app link>>";
-    header($string);
-    die();
-}else if($Android){
-    //browser reported as an Android device -- do something here
-    $string = "Location: https://play.google.com/store/apps/details?id=ays.instant.service&fbclid=IwZXh0bgNhZW0CMTAAAR3vfD1I-WA6JzX7LmM15XRXXbmAmd3Vmu0ikTgsLamxMeUxyYNa633dGHg_aem_AauGbzBOycNRPRr6Fd7BGoZ7KdN_qt09sGk1wys6a7X1-fwNOl2GoQvQeK6JBvfhqKaM45R591VbcS51bDmpg3hL&pli=1";
-    header($string);
+    $iPod    = stripos($_SERVER['HTTP_USER_AGENT'],"iPod");
+    $iPhone  = stripos($_SERVER['HTTP_USER_AGENT'],"iPhone");
+    $iPad    = stripos($_SERVER['HTTP_USER_AGENT'],"iPad");
+    $Android = stripos($_SERVER['HTTP_USER_AGENT'],"Android");
     
-    die();
-}
-
+    
+    //do something with this information
+    if( $iPod || $iPhone ){
+        //browser reported as an iPhone/iPod touch -- do something here
+        $string = "Location: <<your itunes app link>>";
+        header($string);
+        die();
+    }else if($iPad){
+        //browser reported as an iPad -- do something here
+        $string = "Location: <<your itunes app link>>";
+        header($string);
+        die();
+    }else if($Android){
+        //browser reported as an Android device -- do something here
+        $string = "Location: https://play.google.com/store/apps/details?id=ays.instant.service&fbclid=IwZXh0bgNhZW0CMTAAAR3vfD1I-WA6JzX7LmM15XRXXbmAmd3Vmu0ikTgsLamxMeUxyYNa633dGHg_aem_AauGbzBOycNRPRr6Fd7BGoZ7KdN_qt09sGk1wys6a7X1-fwNOl2GoQvQeK6JBvfhqKaM45R591VbcS51bDmpg3hL&pli=1";
+        header($string);
+        
+        die();
+    }
+    
 });
-
 
 Route::get('/kuha', function () {
     $earningNeo = EarningsNeo::get();
@@ -261,7 +255,7 @@ Route::group(['middleware' => ['auth', 'verified']], function()
         Route::post('coupons-action',[CouponController::class, 'action'])->name('coupon.action');
         Route::post('coupon/{id}', [CouponController::class, 'destroy'])->name('coupon.destroy');
     });
-   
+
     Route::group(['middleware' => ['permission:booking list']], function () {
         Route::resource('booking', BookingController::class);
         Route::get('booking-index-data',[BookingController::class,'index_data'])->name('booking.index_data');
@@ -519,6 +513,11 @@ Route::group(['middleware' => ['auth', 'verified']], function()
         Route::post('blog/{id}', [BlogController::class, 'destroy'])->name('blog.destroy');
     });
 
+    Route::group(['middleware' => ['permission:service list']], function () {
+        Route::resource('serviceaddon', ServiceAddonController::class);
+        Route::get('serviceaddon-index-data',[ServiceAddonController::class,'index_data'])->name('serviceaddon.index-data');
+        Route::post('serviceaddon-bulk-action', [ServiceAddonController::class, 'bulk_action'])->name('serviceaddon.bulk-action');
+    });
 
 });
 Route::get('/ajax-list',[HomeController::class, 'getAjaxList'])->name('ajax-list');

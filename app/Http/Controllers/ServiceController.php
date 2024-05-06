@@ -174,6 +174,7 @@ class ServiceController extends Controller
        
 
         $settingdata = Setting::where('type','=','ADVANCED_PAYMENT_SETTING')->first();
+        //$digitalservicedata = Setting::where('type','=','DIGITAL_SERVICE_SETTING')->first();
          
         $pageTitle = __('messages.update_form_title',['form'=> __('messages.service')]);
         
@@ -198,7 +199,7 @@ class ServiceController extends Controller
         }
        
         $services = $request->all();
-      
+        
         $services['service_type'] = !empty($request->service_type) ? $request->service_type : 'service';
         $services['provider_id'] = !empty($request->provider_id) ? $request->provider_id : auth()->user()->id;
         if(auth()->user()->hasRole('user')){
@@ -241,10 +242,13 @@ class ServiceController extends Controller
                 }
             }
         }
+        
         if(!$request->is('api/*')) {
             $services['is_featured'] = 0;
             $services['is_slot'] = 0;
+            //$services['digital_service'] = 0;
             $services['is_enable_advance_payment'] = 0;
+           
             if($request->has('is_featured')){
                 $services['is_featured'] = 1;
             }
@@ -254,9 +258,11 @@ class ServiceController extends Controller
             if($request->has('is_slot')){
                 $services['is_slot'] = 1;
             }
+            // if($request->has('digital_service')){
+            //     $services['digital_service'] = 1;
+            // }
+            
         }
-      
-       
         if(!empty($request->advance_payment_amount)){
             $services['advance_payment_amount'] = $request->advance_payment_amount;
         }

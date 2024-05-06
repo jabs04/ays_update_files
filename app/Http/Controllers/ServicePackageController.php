@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\ServicePackage;
 use App\Models\PackageServiceMapping;
 use Yajra\DataTables\DataTables;
+use App\Models\BookingPackageMapping;
 
 class ServicePackageController extends Controller
 {
@@ -273,6 +274,14 @@ class ServicePackageController extends Controller
         $servicepackage = ServicePackage::where('id',$id)->first();
         $msg = __('messages.not_found_entry',['name' => __('messages.service_package')] );
         if($request->type === 'forcedelete'){
+            $bookingPackageMappings = $servicepackage->bookingPackageMappings;
+            foreach ($bookingPackageMappings as $bookingPackageMapping) {
+                $booking = $bookingPackageMapping->bookings; 
+                if ($booking) {
+                    $booking->delete(); 
+                }
+                $bookingPackageMapping->delete();
+            }
             $servicepackage->forceDelete();
             $msg = __('messages.msg_forcedelete',['name' => __('messages.service_package')] );
         }

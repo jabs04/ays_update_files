@@ -170,7 +170,7 @@ class WalletController extends Controller
 		}
         return redirect(route('wallet.index'))->withSuccess($message); 
     }
-    public function walletUpdate(Request $request)
+public function walletUpdate(Request $request)
     {
         
         $getWallet = DB::table('wallets')->where('user_id', $request['user_id'])->first();

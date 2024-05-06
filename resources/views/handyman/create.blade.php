@@ -76,11 +76,12 @@
                             </div>
                             @endif
                             <div class="form-group col-md-4">
-                                {{ Form::label('name', __('messages.select_name',[ 'select' => __('messages.provider_address') ]).' <span class="text-danger"></span>',['class'=>'form-control-label'],false) }}
+                                {{ Form::label('name', __('messages.select_name',[ 'select' => __('messages.provider_address') ]).' <span class="text-danger">*</span>',['class'=>'form-control-label'],false) }}
                                 <br />
                                 {{ Form::select('service_address_id', [], old('service_address_id'), [
                                         'class' => 'select2js form-group service_address_id',
                                         'id' =>'service_address_id',
+                                        'required',
                                         'data-placeholder' => __('messages.select_name',[ 'select' => __('messages.provider_address') ]),
                                     ]) }}
                             </div>

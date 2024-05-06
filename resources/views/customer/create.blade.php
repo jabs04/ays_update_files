@@ -139,7 +139,7 @@
             $('#contact_number_err').text('Please enter a valid mobile number');
         }
     });
- 
+
     $(document).ready(function() {
         var country_id = "{{ isset($customerdata->country_id) ? $customerdata->country_id : 173 }}";
         var state_id = "{{ isset($customerdata->state_id) ? $customerdata->state_id : 0 }}";

@@ -122,6 +122,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('user-ratings-delete/{id}', [ App\Http\Controllers\BookingRatingController::class, 'destroy' ] );
 
     Route::get('get-cash-payment-history',[API\PaymentController::class, 'getCashPaymentHistory']);
-    Route::post('cash-payment-history-delete/{id}',[App\Http\Controllers\PaymentController::class, 'destroy']);
+
+    Route::get('get-cash-payment',[API\PaymentController::class, 'getCashPayment']);
+    Route::post('cash-payment-delete/{id}',[App\Http\Controllers\PaymentController::class, 'destroy']);
 
 });

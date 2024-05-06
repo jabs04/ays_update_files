@@ -146,7 +146,7 @@
                 
             });
         @else
-            window.renderedDataTable = $('#datatable').DataTable({
+        window.renderedDataTable = $('#datatable').DataTable({
                 processing: true,
                 serverSide: true,
                 autoWidth: false,

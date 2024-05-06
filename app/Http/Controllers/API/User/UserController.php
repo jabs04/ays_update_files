@@ -29,7 +29,8 @@ class UserController extends Controller
     public function register(UserRequest $request)
     {
         $input = $request->all();
-                
+        $email = $input['email'];
+        $username = $input['username'];
         $password = $input['password'];
         $input['display_name'] = $input['first_name']." ".$input['last_name'];
         $input['user_type'] = isset($input['user_type']) ? $input['user_type'] : 'user';
@@ -39,8 +40,31 @@ class UserController extends Controller
         {
             $input['status'] = isset($input['status']) ? $input['status']: 0;
         }
-        $user = User::create($input);
-        $user->assignRole($input['user_type']);
+        $user = User::withTrashed()
+        ->where(function ($query) use ($email, $username) {
+            $query->where('email', $email)->orWhere('username', $username);
+        })
+        ->first();
+        if($user){
+            if($user->deleted_at == null){
+
+                $message = trans('messages.login_form');
+                $response = [
+                    'message' => $message,
+                ];
+                return comman_custom_response($response);
+            }
+            $message = trans('messages.deactivate');
+            $response = [
+                'message' => $message,
+                'Isdeactivate' => 1,
+            ];
+            return comman_custom_response($response);
+        }
+        else{
+            $user = User::create($input);
+            $user->assignRole($input['user_type']);
+        }   
         
         if($user->user_type == 'provider' || $user->user_type == 'user'){
             $wallet = array(
@@ -74,7 +98,20 @@ class UserController extends Controller
     }
 
     public function login()
-    {      
+    {  
+        $Isactivate = request('Isactivate');
+        if($Isactivate == 1){
+            $user = User::withTrashed()
+            ->where('email', request('email'))
+            ->first();
+            if($user){
+                $user->restore();
+            }else{
+                $message = trans('auth.failed');
+                return comman_message_response($message, 406);
+            }
+             
+        }
         if(Auth::attempt(['email' => request('email'), 'password' => request('password')])){
             
             $user = Auth::user();
@@ -142,7 +179,7 @@ class UserController extends Controller
         $status = isset($request['status']) ? $request['status'] : 1;
 
         $user_list = User::orderBy('id','desc')->where('user_type',$user_type);
-        if(!empty($request->status)){
+        if(!empty($status)){
             $user_list = $user_list->where('status',$status);
         }
         

@@ -400,7 +400,11 @@ class HandymanController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return redirect()->route('handyman.changepassword',['id' => $user->id])->with('errors', $validator->errors());
+            if ($validator->errors()->has('password')) {
+                $message = __('messages.confirmed',['name' => __('messages.password')]);
+                return redirect()->route('handyman.changepassword', ['id' => $user->id])->with('error', $message);
+            }
+            return redirect()->route('handyman.changepassword', ['id' => $user->id])->with('errors', $validator->errors());
         }
 
         $hashedPassword = $user->password;

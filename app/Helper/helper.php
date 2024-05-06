@@ -895,7 +895,7 @@ function calculate_commission($total_amount = 0,$provider_commission = 0, $commi
             'number_format' => 0
           ];
     }
-    //samsam_calc
+//samsam_calc
     switch ($type) {
       case 'provider':
           $earning =   ($total_amount) - ($provider_commission * $count);
@@ -1357,7 +1357,7 @@ function sendNotification($type,$user,$data){
     date_default_timezone_set( $admin->time_zone ?? 'UTC');
     $data['datetime'] = date('Y-m-d H:i:s');
     $role = auth()->user()->user_type;
-    $heading      = array(
+        $heading      = array(
         "en" =>  __('messages.post_request_title')
     );
     $content      = array(

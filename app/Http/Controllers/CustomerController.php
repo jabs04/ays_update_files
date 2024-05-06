@@ -34,7 +34,7 @@ class CustomerController extends Controller
         $list_status = $request->status;
         return view('customer.index', compact('list_status','pageTitle','assets','auth_user','filter'));
     }
-    public function neo_list(Request $request)
+public function neo_list(Request $request)
     {
         $filter = [
             'status' => "sample",
@@ -102,7 +102,7 @@ class CustomerController extends Controller
             ->rawColumns(['check','display_name','action','status'])
             ->toJson();
     }
-    public function index_neodata(DataTables $datatable,Request $request)
+public function index_neodata(DataTables $datatable,Request $request)
     {
         $query = User::query();
         $filter = $request->filter;
@@ -314,15 +314,13 @@ class CustomerController extends Controller
         $data = $request->all();
         $id = $data['id'];
         $data['user_type'] = $data['user_type'] ?? 'user';
-        
+
         $data['display_name'] = $data['first_name']." ".$data['last_name'];
-        // dd($data);
-        // dd($request->area);
         // Save User data...
         if($id == null){
             $data['password'] = bcrypt($data['password']);
             $user = User::create($data);
-            if($user){
+        if($user){
                 $lastestId = DB::table('users')->orderByDesc('id')->first();
                 // DB::table('users')->where('id', $lastestId->id)->update(['area' => strval($request->area)]);
                 $getWallet = DB::table('wallets')->where('user_id', $lastestId->id)->first();
@@ -347,7 +345,7 @@ class CustomerController extends Controller
 			$message = __('messages.save_form',[ 'form' => __('messages.user') ] );
 		}
 
-		return redirect(route('user.create_neo'))->withSuccess($message);
+		return redirect(route('user.index'))->withSuccess($message);
     }
     public function neo_store(UserRequest $request)
     {
@@ -389,6 +387,7 @@ class CustomerController extends Controller
         $message = __('messages.update_form',[ 'form' => __('messages.user') ] );
 		return redirect(route('user.neo_list'))->withSuccess($message);
     }
+
     /**
      * Display the specified resource.
      *
@@ -504,7 +503,11 @@ class CustomerController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return redirect()->route('user.changepassword',['id' => $user->id])->with('errors', $validator->errors());
+            if ($validator->errors()->has('password')) {
+                $message = __('messages.confirmed',['name' => __('messages.password')]);
+                return redirect()->route('user.changepassword', ['id' => $user->id])->with('error', $message);
+            }
+            return redirect()->route('user.changepassword', ['id' => $user->id])->with('errors', $validator->errors());
         }
 
         $hashedPassword = $user->password;

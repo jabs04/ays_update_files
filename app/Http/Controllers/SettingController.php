@@ -553,7 +553,7 @@ class SettingController extends Controller
 
     /* advance earnning setting */ 
     public function advanceEarningSetting(Request $request)
-    {
+        {
             $data = $request->all();
             $value = json_encode($request->except('_token'));
             $message = trans('messages.failed');

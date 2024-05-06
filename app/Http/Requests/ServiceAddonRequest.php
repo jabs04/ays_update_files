@@ -8,7 +8,7 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class ServiceRequest extends FormRequest
+class ServiceAddonRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -27,32 +27,16 @@ class ServiceRequest extends FormRequest
      */
     public function rules()
     {
-        $id = request()->id;
         return [
+            //
             'name'                           => 'required',
-            'category_id'                    => 'required',
-            'type'                           => 'required',
-            'price'                          => 'required|integer|min:0',   
-            // 'duration'                       => 'required',   
-            'status'                         => 'required',
+            'service_id'                     => 'required',
+            'price'                          => 'required|integer|min:0',    
+            'serviceaddon_image'             => 'mimes:jpg,jpeg,png,webp'
         ];
     }
-    public function messages()
-    {
-        return [];
-    }
-
     protected function failedValidation(Validator $validator)
     {
-        if ( request()->is('api*')){
-            $data = [
-                'status' => 'false',
-                'message' => $validator->errors()->first(),
-                'all_message' =>  $validator->errors()
-            ];
-            
-            throw new HttpResponseException(response()->json($data,422));
-        }
 
         throw new HttpResponseException(redirect()->back()->withInput()->with('errors', $validator->errors()));
     }

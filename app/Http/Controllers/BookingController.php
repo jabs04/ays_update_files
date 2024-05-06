@@ -37,7 +37,7 @@ class BookingController extends Controller
         $assets = ['datatable'];
         return view('booking.index', compact('pageTitle','auth_user','assets','filter'));
     }
-    public function commission(Request $request)
+public function commission(Request $request)
     {
         $commissions = DB::table('commission')->first();
         $pageTitle = "Commission";
@@ -168,7 +168,7 @@ class BookingController extends Controller
             ->rawColumns(['action','status','payment_id','service_id','id','check'])
             ->toJson();
     }
-    //add ng provider
+//add ng provider
     public function add_neo(Request $request)
     {
         $id = $request->tagId;
@@ -447,6 +447,24 @@ class BookingController extends Controller
             
             $result->addressAdded()->create($booking_address_data);
         }
+        
+        if ($request->has('service_addon_id') && is_array($request->service_addon_id) != null) {
+            foreach ($request->service_addon_id as $serviceaddon) {
+                $booking_serviceaddon_mapping = ServiceAddon::find($serviceaddon);
+                if ($booking_serviceaddon_mapping) {
+                    $booking_serviceaddon_data = [
+                        'booking_id' => $result->id,
+                        'service_addon_id' => $booking_serviceaddon_mapping->id,
+                        'name' => $booking_serviceaddon_mapping->name,
+                        'price' => $booking_serviceaddon_mapping->price,
+                    ];
+                    
+                   $result->bookingAddonService()->create($booking_serviceaddon_data);
+                }
+            }
+        }
+        
+    
         if($request->has('booking_package') && $request->booking_package != null) {
             $booking_package = [
                'booking_id' => $result->id,
@@ -499,7 +517,7 @@ class BookingController extends Controller
      */
     public function show($id)
     {
-        $auth_user = authSession();
+      $auth_user = authSession();
 
          $user = auth()->user();
          $user->last_notification_seen = now();
@@ -519,7 +537,7 @@ class BookingController extends Controller
         
              }
                   
-        }   
+        }
 
     
         $bookingdata = Booking::with('bookingExtraCharge','payment')->myBooking()->find($id);
@@ -805,9 +823,7 @@ class BookingController extends Controller
         $auth_user = authSession();
         $user_id = $auth_user->id;
         $user_data = User::find($user_id);
-        $bookingdata = Booking::with('handymanAdded', 'payment', 'bookingExtraCharge')->myBooking()->find($id);
-        
-        
+        $bookingdata = Booking::with('handymanAdded', 'payment', 'bookingExtraCharge', 'bookingAddonService')->myBooking()->find($id);
         switch ($tabpage) {
             case 'info':
                 $data  = view('booking.' . $tabpage, compact('user_data', 'tabpage', 'auth_user', 'bookingdata'))->render();
