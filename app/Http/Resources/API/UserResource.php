@@ -76,6 +76,7 @@ class UserResource extends JsonResource
             'is_favourite'  => UserFavouriteProvider::where('user_id',$request->login_user_id)->where('provider_id',$request->id)->first() ? 1 : 0,
             'player_ids' =>$this->playerids->pluck('player_id'),
             'total_services_booked' => Booking::where('provider_id',$this->id)->count('service_id'),
+            'why_choose_me' => $this->why_choose_me,
         ];
     }
 }
