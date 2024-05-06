@@ -22,6 +22,9 @@
             <li class="nav-item payment-link">
                 <a href="javascript:void(0)" data-href="{{ route('payment_layout_page') }}?tabpage=sadad" data-target=".payment_paste_here" data-toggle="tabajax"  class="nav-link  {{$tabpage=='sadad'?'active':''}}"   rel="tooltip"> {{__('messages.sadad')}}</a>
             </li>
+            <li class="nav-item payment-link">
+                <a href="javascript:void(0)" data-href="{{ route('payment_layout_page') }}?tabpage=airtel" data-target=".payment_paste_here" data-toggle="tabajax"  class="nav-link  {{$tabpage=='airtel'?'active':''}}"   rel="tooltip"> {{__('messages.airtel_money')}}</a>
+            </li>
         </ul>
         <div class="card payment-content-wrapper">
             <div class="card-body">

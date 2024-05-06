@@ -40,6 +40,9 @@
                                                 <a href="javascript:void(0)" data-href="{{ route('layout_page') }}?page=config-setting" data-target=".paste_here" class="nav-link {{$page=='config-setting'?'active':''}}"  data-toggle="tabajax" rel="tooltip"> {{ __('messages.config_settings') }}</a>
                                             </li>
                                             <li class="nav-item">
+                                                <a href="javascript:void(0)" data-href="{{ route('layout_page') }}?page=other-setting" data-target=".paste_here" class="nav-link {{$page=='other-setting'?'active':''}}"  data-toggle="tabajax" rel="tooltip"> {{ __('messages.app_config_setting') }}</a>
+                                            </li>
+                                            <li class="nav-item">
                                                 <a href="javascript:void(0)" data-href="{{ route('layout_page') }}?page=mail-setting" data-target=".paste_here" class="nav-link {{$page=='mail-setting'?'active':''}}"  data-toggle="tabajax" rel="tooltip"> {{ __('messages.mail_settings') }}</a>
                                             </li>
                                             <li class="nav-item">
@@ -54,12 +57,13 @@
                                             <li class="nav-item">
                                                 <a href="javascript:void(0)" data-href="{{ route('layout_page') }}?page=earning-setting" data-target=".paste_here" class="nav-link {{$page=='earning-setting'?'active':''}}"  data-toggle="tabajax" rel="tooltip"> {{ __('messages.earning_setting') }}</a>
                                             </li>
-                                            <li class="nav-item">
+                                            <!-- <li class="nav-item">
                                                 <a href="javascript:void(0)" data-href="{{ route('layout_page') }}?page=advance-payment-setting" data-target=".paste_here" class="nav-link {{$page=='advance-payment-setting'?'active':''}}"  data-toggle="tabajax" rel="tooltip"> {{ __('messages.service_setting') }}</a>
                                             </li>
                                             <li class="nav-item">
                                                 <a href="javascript:void(0)" data-href="{{ route('layout_page') }}?page=user-wallet-setting" data-target=".paste_here" class="nav-link {{$page=='user-wallet-setting'?'active':''}}"  data-toggle="tabajax" rel="tooltip"> {{ __('messages.user_wallet_setting') }}</a>
-                                            </li>
+                                            </li> -->
+                                             
                                         @endhasanyrole
                                     @endif
                                 </ul>
