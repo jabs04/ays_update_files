@@ -175,6 +175,10 @@ class DashboardController extends Controller
         if($is_advanced_allowed !== null){
             $is_advanced_allowed = $is_advanced_allowed->value;
         }
+        // $is_digital_service_allowed = Setting::where('type','=','DIGITAL_SERVICE_SETTING')->first();
+        // if($is_digital_service_allowed !== null){
+        //     $is_digital_service_allowed = $is_digital_service_allowed->value;
+        // }
         $blogs = Blog::paginate($per_page);
         $blogs = BlogResource::collection($blogs);
         $enable_user_wallet = Setting::where('type', '=', 'USER_WALLET_SETTING')->first();
@@ -205,6 +209,7 @@ class DashboardController extends Controller
            'app_download' => !empty($app_download) ? $app_download : null,
            'upcomming_booking' => $upcomming_booking,
            'is_advanced_payment_allowed' =>$is_advanced_allowed,
+           //'is_digital_service_allowed' =>$is_digital_service_allowed,
            'blogs' => $blogs,
            'enable_user_wallet' => $enable_user_wallet
         ];
@@ -302,6 +307,10 @@ class DashboardController extends Controller
         if($is_advanced_allowed !== null){
             $is_advanced_allowed = $is_advanced_allowed->value;
         }
+        // $is_digital_service_allowed = Setting::where('type','=','DIGITAL_SERVICE_SETTING')->first();
+        // if($is_digital_service_allowed !== null){
+        //     $is_digital_service_allowed = $is_digital_service_allowed->value;
+        // }
         $response = [
             'status'         => true,
             'total_booking'  => $total_booking,
@@ -331,7 +340,7 @@ class DashboardController extends Controller
             'app_download' =>$app_download,
             'upcomming_booking' => $upcomming_booking,
             'is_advanced_payment_allowed' =>$is_advanced_allowed,
-            
+            //'is_digital_service_allowed' =>$is_digital_service_allowed,
          ];
  
          return comman_custom_response($response);
@@ -400,6 +409,14 @@ class DashboardController extends Controller
         if(!empty($upcomming_booking)){
             $upcomming_booking = BookingResource::collection($upcomming_booking);
         }
+        // $is_digital_service_allowed = Setting::where('type','=','DIGITAL_SERVICE_SETTING')->first();
+        // if($is_digital_service_allowed !== null){
+        //     $is_digital_service_allowed = $is_digital_service_allowed->value;
+        // }
+        $service = Service::myService()->where('status',1);
+        $total_service = $service->count();
+        $service = $service->orderBy('id','desc')->paginate($per_page);
+        $service = ServiceResource::collection($service);
         $response = [
             'status'                        => true,
             'today_cash' =>                today_cash_total(auth()->user()->id,Carbon::today(),Carbon::today()),
@@ -421,7 +438,8 @@ class DashboardController extends Controller
             'isHandymanAvailable'           => $handyman->is_available,
             'completed_booking'             => $completed_booking->count(),
             'upcomming_booking'             => $upcomming_booking,
-
+            'service'                       => $service,
+            //'is_digital_service_allowed'    => $is_digital_service_allowed,
          ];
          return comman_custom_response($response);
 
@@ -447,7 +465,10 @@ class DashboardController extends Controller
         if($is_advanced_allowed !== null){
             $is_advanced_allowed = $is_advanced_allowed->value;
         }
-
+        // $is_digital_service_allowed = Setting::where('type','=','DIGITAL_SERVICE_SETTING')->first();
+        // if($is_digital_service_allowed !== null){
+        //     $is_digital_service_allowed = $is_digital_service_allowed->value;
+        // }
     
         $response = [
             'status'                        => true,
@@ -470,6 +491,7 @@ class DashboardController extends Controller
             'earning_type'                  => default_earning_type(),
             'post_requests' => $post_requests,
             'is_advanced_payment_allowed' =>$is_advanced_allowed,
+            //'is_digital_service_allowed'    => $is_digital_service_allowed,
 
          ];
  

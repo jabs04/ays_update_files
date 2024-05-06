@@ -52,7 +52,7 @@ class SubCategoryController extends Controller
         
         return comman_custom_response($response);
     }
-    public function states(Request $request)
+public function states(Request $request)
     {
         //173 PH
         $states = DB::table("states")->where('country_id', 173)->get();

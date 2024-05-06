@@ -130,7 +130,7 @@ class PaymentController extends Controller
             'amount' => getPriceFormat((float)$data['total_amount']) ]);
         }
         $result = \App\Models\PaymentHistory::create($data);
-
+      
 
         DB::table('consoles')->insert([
             'data' => 'Payment History'
@@ -276,5 +276,39 @@ class PaymentController extends Controller
 
         return comman_custom_response($response);
     }
-   
+
+    public function getCashPayment(Request $request)
+    {
+        $payment = Payment::where('payment_type', 'cash');
+        
+        $per_page = config('constant.PER_PAGE_LIMIT');
+        if( $request->has('per_page') && !empty($request->per_page)){
+            if(is_numeric($request->per_page)){
+                $per_page = $request->per_page;
+            }
+            if($request->per_page === 'all' ){
+                $per_page = $payment->count();
+            }
+        }
+
+        $payment = $payment->orderBy('id','desc')->paginate($per_page);
+        $items = PaymentResource::collection($payment);
+
+        $response = [
+            'pagination' => [
+                'total_items' => $items->total(),
+                'per_page' => $items->perPage(),
+                'currentPage' => $items->currentPage(),
+                'totalPages' => $items->lastPage(),
+                'from' => $items->firstItem(),
+                'to' => $items->lastItem(),
+                'next_page' => $items->nextPageUrl(),
+                'previous_page' => $items->previousPageUrl(),
+            ],
+            'data' => $items,
+        ];
+        
+        return comman_custom_response($response);
+    }
+
 }

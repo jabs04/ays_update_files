@@ -20,6 +20,8 @@ use App\Http\Resources\API\ProviderTaxResource;
 use App\Models\ProviderServiceAddressMapping;
 use App\Models\ProviderTaxMapping;
 use App\Models\Category;
+use App\Models\ServiceAddon;
+use App\Http\Resources\API\ServiceAddonResource;
 
 class ServiceController extends Controller
 {
@@ -155,13 +157,13 @@ class ServiceController extends Controller
        
         if(auth()->user() !== null){
             if(auth()->user()->hasRole('admin')){
-                $service = Service::where('service_type','service')->withTrashed()->with('providers','category','serviceRating')->findorfail($id);
+                $service = Service::where('service_type','service')->withTrashed()->with('providers','category','serviceRating','serviceAddon')->findorfail($id);
             }
             else{
-                $service = Service::where('service_type','service')->with('providers','category','serviceRating')->findorfail($id);
+                $service = Service::where('service_type','service')->with('providers','category','serviceRating','serviceAddon')->findorfail($id);
             }
         }else{
-            $service = Service::where('service_type','service')->where('status',1)->with('providers','category','serviceRating')->find($id);
+            $service = Service::where('service_type','service')->where('status',1)->with('providers','category','serviceRating','serviceAddon')->find($id);
         }
        
         if(empty($service)){
@@ -206,6 +208,8 @@ class ServiceController extends Controller
         $tax = ProviderTaxMapping::with('taxes')->where('provider_id',$service->provider_id)->get();
         $taxes = ProviderTaxResource::collection($tax);
         $servicefaq =  ServiceFaq::where('service_id',$id)->get();
+        $serviceAddon = ServiceAddon::where('service_id',$id)->where('status',1)->get();
+        $serviceaddon =  ServiceAddonResource::collection($serviceAddon);
         $response = [
             'service_detail'    => $service_detail,
             'provider'          => new UserResource(optional($service->providers)),
@@ -214,7 +218,8 @@ class ServiceController extends Controller
             'coupon_data'       => $coupon_data,
             'taxes'             => $taxes,
             'related_service'   => $related_service,
-            'service_faq'        => $servicefaq
+            'service_faq'       => $servicefaq,
+            'serviceaddon'      => $serviceaddon
         ];
 
         return comman_custom_response($response);
