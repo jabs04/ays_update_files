@@ -59,6 +59,7 @@ return [
         Chain::class => [
             GoogleMaps::class => [
                 env('GOOGLE_MAPS_LOCALE', 'us'),
+                //'AIzaSyCtTed7y_ePqg1QoDMHOyu01FtP_Ot-mDU',
                 env('GOOGLE_MAPS_API_KEY'),
             ],
             GeoPlugin::class  => [],
