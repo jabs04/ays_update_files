@@ -75,4 +75,8 @@ return [
         'SEND_PROVIDER' => 'send_to_provider',
         'SEND_ADMIN' => 'send_to_admin'
     ],
+    'VISIT_TYPE' =>[
+        'ON_SITE' => 'On Site',
+        'ONLINE' => 'Online',
+    ],
 ];
