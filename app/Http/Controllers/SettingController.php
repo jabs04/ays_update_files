@@ -12,8 +12,10 @@ use Session;
 use Config;
 use Hash;
 use Validator;
+use App\Models\ProviderSlotMapping;
 use App\Http\Requests\UserRequest;
 use App\Notifications\CommonNotification;
+use Auth;
 
 class SettingController extends Controller
 {
@@ -99,6 +101,19 @@ class SettingController extends Controller
                 $data  = view('setting.' . $page, compact('settings', 'user_data', 'page'))->render();
                 break;
             case 'profile_form':
+                $why_choose_me = json_decode($user_data->why_choose_me, true); 
+
+                if ($why_choose_me !== null && is_array($why_choose_me)) {
+                    $user_data['title'] = $why_choose_me['title'] ?? null;
+                    $user_data['about_description'] = $why_choose_me['about_description'] ?? null;
+                    $user_data['reason'] = $why_choose_me['reason'] ?? null;
+  
+                } else {
+                    $user_data['title'] =  null;
+                    $user_data['about_description'] = null;
+                    $user_data['reason'] =  null;
+                }
+
                 $data  = view('setting.' . $page, compact('settings', 'user_data', 'page'))->render();
                 break;
             case 'mail-setting':
@@ -133,6 +148,38 @@ class SettingController extends Controller
             case 'user-wallet-setting':
                 $wallet = Setting::where('type', '=', 'USER_WALLET_SETTING')->first();
                 $data = view('setting.' . $page, compact('settings', 'page', 'wallet'))->render();
+                break;
+            case 'other-setting':
+                $othersetting   = Setting::where('type','=','OTHER_SETTING')->first();
+
+                if(!empty($othersetting['value'])){
+                    $decodedata = json_decode($othersetting['value']);
+
+                
+                    $othersetting['social_login'] = $decodedata->social_login;
+                    $othersetting['google_login'] = $decodedata->google_login;
+                    $othersetting['apple_login'] = $decodedata->apple_login;
+                    $othersetting['otp_login'] = $decodedata->otp_login;
+                    $othersetting['post_job_request'] = $decodedata->post_job_request;
+                    $othersetting['blog'] = $decodedata->blog;
+                    $othersetting['maintenance_mode'] = $decodedata->maintenance_mode;
+                    $othersetting['force_update_user_app'] = $decodedata->force_update_user_app;
+                    $othersetting['user_app_minimum_version'] = $decodedata->user_app_minimum_version;
+                    $othersetting['user_app_latest_version'] = $decodedata->user_app_latest_version;
+                    $othersetting['force_update_provider_app'] = $decodedata->force_update_provider_app;
+                    $othersetting['provider_app_minimum_version'] = $decodedata->provider_app_minimum_version;
+                    $othersetting['provider_app_latest_version'] = $decodedata->provider_app_latest_version;
+                    $othersetting['force_update_admin_app'] = $decodedata->force_update_admin_app;
+                    $othersetting['admin_app_minimum_version'] = $decodedata->admin_app_minimum_version;
+                    $othersetting['admin_app_latest_version'] = $decodedata->admin_app_latest_version;
+                    $othersetting['advanced_payment_setting'] = $decodedata->advanced_payment_setting;
+                    $othersetting['wallet'] = $decodedata->wallet;
+                    // $othersetting['maintenance_mode_secret_code'] = $decodedata->maintenance_mode_secret_code;
+                    
+                }
+
+                  
+                $data = view('setting.' . $page, compact('settings', 'page','othersetting'))->render();
                 break;
             default:
                 $data  = view('setting.' . $page, compact('settings', 'page', 'envSettting'))->render();
@@ -231,7 +278,21 @@ class SettingController extends Controller
         $user = \Auth::user();
         $page = $request->page;
 
-        $user->fill($request->all())->update();
+        $data=$request->all();
+
+        $why_choose_me=[
+
+            'title'=>$request->title,
+            'about_description'=>$request->about_description,
+            'reason' => isset($request->reason) ? array_filter($request->reason, function ($value) {
+                return $value !== null;
+            }) : null,
+
+        ];
+
+        $data['why_choose_me']=json_encode($why_choose_me);
+
+        $user->fill($data)->update();
         storeMediaFile($user, $request->profile_image, 'profile_image');
 
         return redirect()->route('setting.index', ['page' => 'profile_form'])->withSuccess(__('messages.profile') . ' ' . __('messages.updated'));
@@ -600,4 +661,56 @@ class SettingController extends Controller
         return redirect()->route('setting.index')->withSuccess($message);
 
     }
+
+  public function otherSetting(Request $request)
+   {
+    $data = $request->all();
+   
+    $message = trans('messages.failed');
+
+    $other_setting_data['social_login'] = (isset($data['social_login']) && $data['social_login'] == 'on') ? 1 : 0;
+    $other_setting_data['google_login'] =  (isset($data['google_login']) && $data['google_login'] == 'on') ? 1 : 0;
+    $other_setting_data['apple_login'] = (isset($data['apple_login']) && $data['apple_login'] == 'on') ? 1 : 0;
+    $other_setting_data['otp_login'] = (isset($data['otp_login']) && $data['otp_login'] == 'on') ? 1 : 0;
+    $other_setting_data['post_job_request'] = (isset($data['post_job_request']) && $data['post_job_request'] == 'on') ? 1 : 0;
+    $other_setting_data['blog'] = (isset($data['blog']) && $data['blog'] == 'on') ? 1 : 0;
+    $other_setting_data['maintenance_mode'] = (isset($data['maintenance_mode']) && $data['maintenance_mode'] == 'on') ? 1 : 0;
+    $other_setting_data['force_update_user_app'] = (isset($data['force_update_user_app']) && $data['force_update_user_app'] == 'on') ? 1 : 0;
+    $other_setting_data['user_app_minimum_version'] = (isset($data['user_app_minimum_version'])) ? (int)$data['user_app_minimum_version'] : null;
+    $other_setting_data['user_app_latest_version'] = (isset($data['user_app_latest_version'])) ? (int)$data['user_app_latest_version'] : null;
+    $other_setting_data['force_update_provider_app'] = (isset($data['force_update_provider_app']) && $data['force_update_provider_app'] == 'on') ? 1 : 0;
+    $other_setting_data['provider_app_minimum_version'] =(isset($data['provider_app_minimum_version']) ) ? (int)$data['provider_app_minimum_version']: null;
+    $other_setting_data['provider_app_latest_version'] =(isset($data['provider_app_latest_version']) ) ? (int)$data['provider_app_latest_version']: null;
+    $other_setting_data['force_update_admin_app'] = (isset($data['force_update_admin_app']) && $data['force_update_admin_app'] == 'on') ? 1 : 0;
+    $other_setting_data['admin_app_minimum_version'] =(isset($data['admin_app_minimum_version']) ) ? (int)$data['admin_app_minimum_version']: null;
+    $other_setting_data['admin_app_latest_version'] =(isset($data['admin_app_latest_version']) ) ? (int)$data['admin_app_latest_version']: null;
+    $other_setting_data['advanced_payment_setting'] = (isset($data['advanced_payment_setting']) && $data['advanced_payment_setting'] == 'on') ? 1 : 0;
+    $other_setting_data['wallet'] = (isset($data['wallet']) && $data['wallet'] == 'on') ? 1 : 0;
+    // $other_setting_data['maintenance_mode_secret_code'] =(isset($data['maintenance_mode_secret_code']) ) ? $data['maintenance_mode_secret_code']: null;
+
+    // if($other_setting_data['maintenance_mode']==1){
+
+    //     \Artisan::call('down', ['--secret' => $other_setting_data['maintenance_mode_secret_code']]);
+       
+    //   }else{
+
+    //     \Artisan::call('up');
+    //   }
+
+    $data = [
+        'type'  => 'OTHER_SETTING',
+        'key'   => 'OTHER_SETTING',
+        'value' => json_encode($other_setting_data), 
+    ];
+
+    $res = Setting::updateOrCreate(['type' => 'OTHER_SETTING', 'key' => 'OTHER_SETTING'], $data);
+
+    if ($res) {
+        $message = trans('messages.update_form', ['form' => trans('messages.other_setting')]);
+    }
+
+    return redirect()->route('setting.index')->withSuccess($message);
+  }
+
+    
 }

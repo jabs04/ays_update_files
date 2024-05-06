@@ -26,7 +26,10 @@ class EarningController extends Controller
             $provider_commission = optional($provider->providertype)->commission;
             $provider_type = optional($provider->providertype)->type;
 
-            $bookings = Booking::where('provider_id',$provider->id)->whereNotNull('payment_id')->get();
+            $bookings = Booking::where('provider_id', $provider->id)
+            ->where('status', 'completed')
+            ->whereNotNull('payment_id')
+            ->get();
 
             $booking_data = get_provider_commission($bookings);
 
@@ -62,16 +65,28 @@ class EarningController extends Controller
                 'provider_id' => $provider->id,
                 'provider_name' => $provider->display_name,
                 'email' => $provider->email,
-                'commission' => format_commission($provider) == 0 ? '0' : format_commission($provider),
+                'commission' => optional($provider->providertype)->commission,
                 'commission_type' => optional($provider->providertype)->type,
                 'total_bookings' => $bookings->count(),
-                'total_earning' => $totalearning,
-                'taxes' => getPriceFormat($booking_data['tax']),
-                'admin_earning' => $adminearning,
-                'provider_earning' => $providerearning,
-                'provider_earning_formate' => $provider_earning['number_format'],
+                'total_earning' =>round($totalearning, 2),
+                'taxes' =>  round($booking_data['tax'], 2),
+                'admin_earning' => round($adminearning, 2),
+                'provider_earning' => round($providerearning, 2),
+                'provider_earning_formate' =>round($provider_earning['number_format'],2),
             ];
-
+            // $earningData[] = [
+            //     'provider_id' => $provider->id,
+            //     'provider_name' => $provider->display_name,
+            //     'email' => $provider->email,
+            //     'commission' => format_commission($provider) == 0 ? '0' : format_commission($provider),
+            //     'commission_type' => optional($provider->providertype)->type,
+            //     'total_bookings' => $bookings->count(),
+            //     'total_earning' => $totalearning,
+            //     'taxes' => getPriceFormat($booking_data['tax']),
+            //     'admin_earning' => $adminearning,
+            //     'provider_earning' => $providerearning,
+            //     'provider_earning_formate' => $provider_earning['number_format'],
+            // ];
 
         }
 

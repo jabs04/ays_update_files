@@ -171,7 +171,7 @@ class ServiceController extends Controller
 
         $servicedata = Service::find($id);
 
-       
+        $visittype = config('constant.VISIT_TYPE');
 
         $settingdata = Setting::where('type','=','ADVANCED_PAYMENT_SETTING')->first();
         //$digitalservicedata = Setting::where('type','=','DIGITAL_SERVICE_SETTING')->first();
@@ -183,7 +183,7 @@ class ServiceController extends Controller
             $servicedata = new Service;
         }
         
-        return view('service.create', compact('pageTitle' ,'servicedata' ,'auth_user' , 'settingdata'));
+        return view('service.create', compact('pageTitle' ,'servicedata' ,'auth_user' , 'settingdata','visittype'));
     }
 
     /**

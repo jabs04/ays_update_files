@@ -93,6 +93,18 @@ class PaymentGatewayController extends Controller
                 }
                 $data  = view('paymentgateway.'.$tabpage, compact('user_data','tabpage','payment_data'))->render();
                 break;
+
+                case 'airtel':
+                    if(!empty($payment_data['value'])){
+                        $decodedata = json_decode($payment_data['value']);
+                        $payment_data['client_id'] = $decodedata->client_id;
+                        $payment_data['secret_key'] = $decodedata->secret_key;
+                    }
+                    $data  = view('paymentgateway.'.$tabpage, compact('user_data','tabpage','payment_data'))->render();
+                    break;
+    
+
+
             default:
                 $data  = view('paymentgateway.'.$tabpage,compact('tabpage','payment_data'))->render();
                 break;
@@ -228,6 +240,14 @@ class PaymentGatewayController extends Controller
                     'sadad_domain' => $data['sadad_domain']
                 ];
                 break;
+
+                case 'airtel':
+                    $config_data = [
+                        'client_id' => $data['client_id'],
+                        'secret_key' => $data['secret_key'],
+                      
+                    ];
+                    break;
             default:
                 $config_data = [];
                 break;
