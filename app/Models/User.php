@@ -28,7 +28,7 @@ class User extends Authenticatable implements HasMedia
         'display_name', 'providertype_id' , 'is_featured' , 'time_zone' ,'last_notification_seen' , 
         'login_type','service_address_id' , 'uid','is_subscribe',
         'social_image','is_available','designation','last_online_time',
-        'known_languages','skills','description'
+        'known_languages','skills','description','why_choose_me',
     ];
 
     /**
@@ -126,6 +126,7 @@ class User extends Authenticatable implements HasMedia
             }
         });    
     }
+
 
     public function country(){
         return $this->belongsTo(Country::class, 'country_id','id');
