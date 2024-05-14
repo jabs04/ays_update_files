@@ -28,13 +28,15 @@ class ServiceController extends Controller
         $pageTitle = __('messages.list_form_title',['form' => __('messages.service')] );
         $auth_user = authSession();
         $assets = ['datatable'];
-        return view('service.index', compact('pageTitle','auth_user','assets','filter'));
+        return view('service.index', compact('pageTitle','auth_user','assets','filter'));  
     }
 
     // get datatable data
     public function index_data(DataTables $datatable,Request $request)
     {
         $query = Service::query()->myService();
+
+
 
         $filter = $request->filter;
 
@@ -53,12 +55,12 @@ class ServiceController extends Controller
 
                 return '<input type="checkbox" class="form-check-input select-table-row"  id="datatable-row-'.$row->id.'"  name="datatable_ids[]" value="'.$row->id.'" data-type="service" onclick="dataTableRowCheck('.$row->id.',this)">';
             })
-
-            ->editColumn('name', function($query){
+        
+            ->editColumn('name', function($query){                
                 if (auth()->user()->can('service edit')) {
                     $link =  '<a class="btn-link btn-link-hover" href='.route('service.create', ['id' => $query->id]).'>'.$query->name.'</a>';
                 } else {
-                    $link = $query->name;
+                    $link = $query->name; 
                 }
                 return $link;
             })
@@ -84,7 +86,7 @@ class ServiceController extends Controller
             ->editColumn('price' , function ($query){
                 return getPriceFormat($query->price).'-'.ucFirst($query->type);
             })
-
+            
             ->editColumn('discount' , function ($query){
                 return $query->discount ? $query->discount .'%' : '-';
             })
@@ -100,7 +102,7 @@ class ServiceController extends Controller
                     </div>
                 </div>';
             })
-
+           
             ->rawColumns(['action', 'status', 'check','name'])
             ->toJson();
     }
@@ -113,7 +115,7 @@ class ServiceController extends Controller
 
         $message = 'Bulk Action Updated';
 
-
+        
         switch ($actionType) {
             case 'change-status':
                 $branches = Service::whereIn('id', $ids)->update(['status' => $request->status]);
@@ -129,7 +131,7 @@ class ServiceController extends Controller
                 Service::whereIn('id', $ids)->restore();
                 $message = 'Bulk Service Restored';
                 break;
-
+                
             case 'permanently-delete':
                 Service::whereIn('id', $ids)->forceDelete();
                 $message = 'Bulk Service Permanently Deleted';
@@ -155,7 +157,7 @@ class ServiceController extends Controller
         $auth_user = authSession();
         $assets = ['datatable'];
         return view('service.user_service_list', compact('pageTitle','auth_user','assets','filter'));
-
+        
     }
 
     /**
@@ -166,35 +168,24 @@ class ServiceController extends Controller
     public function create(Request $request)
     {
         $id = $request->id;
-
+        
         $auth_user = authSession();
 
         $servicedata = Service::find($id);
 
         $visittype = config('constant.VISIT_TYPE');
 
-        $settingdata = Setting::where('type','=','OTHER_SETTING')->first();
-
-        $advancedPaymentSetting=0;
-
-          if($settingdata) {
-    
-              $settings = json_decode($settingdata->value, true);
-    
-              $advancedPaymentSetting = $settings['advanced_payment_setting'];
-    
-          } 
-
+        $settingdata = Setting::where('type','=','ADVANCED_PAYMENT_SETTING')->first();
         //$digitalservicedata = Setting::where('type','=','DIGITAL_SERVICE_SETTING')->first();
-
+         
         $pageTitle = __('messages.update_form_title',['form'=> __('messages.service')]);
-
+        
         if($servicedata == null){
             $pageTitle = __('messages.add_button_form',['form' => __('messages.service')]);
             $servicedata = new Service;
         }
-
-        return view('service.create', compact('pageTitle' ,'servicedata' ,'auth_user' , 'advancedPaymentSetting','visittype'));
+        
+        return view('service.create', compact('pageTitle' ,'servicedata' ,'auth_user' , 'settingdata','visittype'));
     }
 
     /**
@@ -208,15 +199,15 @@ class ServiceController extends Controller
         if(demoUserPermission()){
             return  redirect()->back()->withErrors(trans('messages.demo_permission_denied'));
         }
-
+       
         $services = $request->all();
-
+        
         $services['service_type'] = !empty($request->service_type) ? $request->service_type : 'service';
         $services['provider_id'] = !empty($request->provider_id) ? $request->provider_id : auth()->user()->id;
         if(auth()->user()->hasRole('user')){
             $services['service_type'] = 'user_post_service';
         }
-
+        
         if($request->id == null && default_earning_type() === 'subscription'){
            $exceed =  get_provider_plan_limit($services['provider_id'],'service');
            if(!empty($exceed)){
@@ -232,7 +223,7 @@ class ServiceController extends Controller
              }
            }
         }
-
+     
         if($request->id == null){
             $services['added_by'] =  !empty($request->added_by) ? $request->added_by :auth()->user()->id;
         }
@@ -253,13 +244,13 @@ class ServiceController extends Controller
                 }
             }
         }
-
+        
         if(!$request->is('api/*')) {
             $services['is_featured'] = 0;
             $services['is_slot'] = 0;
             //$services['digital_service'] = 0;
             $services['is_enable_advance_payment'] = 0;
-
+           
             if($request->has('is_featured')){
                 $services['is_featured'] = 1;
             }
@@ -272,7 +263,7 @@ class ServiceController extends Controller
             // if($request->has('digital_service')){
             //     $services['digital_service'] = 1;
             // }
-
+            
         }
         if(!empty($request->advance_payment_amount)){
             $services['advance_payment_amount'] = $request->advance_payment_amount;
@@ -339,7 +330,7 @@ class ServiceController extends Controller
             return redirect(route('provider.index'))->withError($msg);
         }
         $pageTitle = __('messages.view_form_title', ['form' => __('messages.provider')]);
-
+        
         return view('service.view', compact('pageTitle','providerdata', 'auth_user', 'tabpage'));
     }
 
@@ -383,7 +374,7 @@ class ServiceController extends Controller
         }
         $service = Service::find($id);
         $msg= __('messages.msg_fail_to_delete',['item' => __('messages.service')] );
-
+        
         if($service!='') {
             $service->delete();
             $msg= __('messages.msg_deleted',['name' => __('messages.service')] );

@@ -29,7 +29,7 @@ class BankController extends Controller
 
     public function index_data(DataTables $datatable,Request $request)
     {
-        $query = Bank::query()->myBank();
+        $query = Bank::query();
         $filter = $request->filter;
 
         if (isset($filter)) {
@@ -40,7 +40,7 @@ class BankController extends Controller
         if (auth()->user()->hasAnyRole(['admin'])) {
             $query->withTrashed();
         }
-
+        
         return $datatable->eloquent($query)
             ->addColumn('check', function ($row) {
                 return '<input type="checkbox" class="form-check-input select-table-row"  id="datatable-row-'.$row->id.'"  name="datatable_ids[]" value="'.$row->id.'" onclick="dataTableRowCheck('.$row->id.')">';
@@ -99,7 +99,7 @@ class BankController extends Controller
                 Bank::whereIn('id', $ids)->restore();
                 $message = 'Bulk Bank Restored';
                 break;
-
+                
             case 'permanently-delete':
                 Bank::whereIn('id', $ids)->forceDelete();
                 $message = 'Bulk Bank Permanently Deleted';
@@ -124,7 +124,7 @@ class BankController extends Controller
         $auth_user = authSession();
 
         $bankdata = Bank::find($id);
-
+     
         $pageTitle = trans('messages.update_form_title', ['form' => trans('messages.bank')]);
 
         if ($bankdata == null) {
@@ -177,7 +177,7 @@ class BankController extends Controller
         }else{
             return redirect(route('bank.index'))->withSuccess($message);
         }
-
+        
     }
 
     /**
@@ -239,7 +239,7 @@ class BankController extends Controller
         }
         $bank = Bank::find($id);
         $msg= __('messages.msg_fail_to_delete',['item' => __('messages.bank')] );
-
+        
         if($bank!='') {
             $bank->delete();
             $msg= __('messages.msg_deleted',['name' => __('messages.bank')] );

@@ -107,6 +107,7 @@
                                     {{ Form::label('visit_type', __('messages.visit_type').' ',['class'=>'form-control-label'],false) }}
                                     <br />
                                     {{ Form::select('visit_type',$visittype,old('visit_type'),[ 'id' => 'visit_type' ,'class' =>'form-control select2js','required']) }}
+                                    <!-- {{ Form::select('visit_type',['on_site' => __('messages.on_site') , 'online' => __('messages.online') ],old('visit_type'),[ 'id' => 'visit_type' ,'class' =>'form-control select2js','required']) }} -->
                                 </div>
 
                             <div class="form-group col-md-4">
@@ -204,7 +205,7 @@
                                 </div>
                             </div>
                             @endif -->
-                            @if(!empty( $advancedPaymentSetting) && $advancedPaymentSetting == 1)
+                            @if(!empty( $settingdata) && $settingdata->value == 1)
                             <div class="form-group col-md-3" id="is_enable_advance">
                                 <div class="custom-control custom-switch">
                                     {{ Form::checkbox('is_enable_advance_payment', $servicedata->is_enable_advance_payment , null, ['class' => 'custom-control-input' , 'id' => 'is_enable_advance_payment' ]) }}

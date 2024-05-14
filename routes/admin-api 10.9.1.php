@@ -57,7 +57,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('coupon-save', [ App\Http\Controllers\CouponController::class, 'store' ] );
     Route::post('coupon-delete/{id}', [ App\Http\Controllers\CouponController::class, 'destroy' ] );
     Route::post('coupon-action',[ App\Http\Controllers\CouponController::class, 'action' ]);
-    Route::get('get-coupon-list',[API\CommanController::class,'getCouponList']);
+    Route::get('coupon-list',[API\CommanController::class,'getCouponList']);
     Route::get('get-coupon-service',[API\CommanController::class,'getCouponService']);
 
 

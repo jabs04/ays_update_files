@@ -17,11 +17,9 @@ use App\Models\ProviderAddressMapping;
 use App\Http\Requests\BookingUpdateRequest;
 use App\Models\Notification;
 use Yajra\DataTables\DataTables;
-use PDF;
+use PDF; 
 use App\Models\AppSetting;
 use Carbon\Carbon;
-use App\Models\ServiceAddon;
-use App\Models\BookingServiceAddonMapping;
 class BookingController extends Controller
 {
     /**
@@ -73,7 +71,7 @@ public function commission(Request $request)
 
     public function index_data(DataTables $datatable,Request $request)
     {
-        $query = Booking::query()->myBooking();
+        $query = Booking::query();
         $filter = $request->filter;
 
         if (isset($filter)) {
@@ -84,7 +82,7 @@ public function commission(Request $request)
         if (auth()->user()->hasAnyRole(['admin'])) {
             $query->withTrashed();
         }
-
+        
         return $datatable->eloquent($query)
             ->addColumn('check', function ($row) {
                 return '<input type="checkbox" class="form-check-input select-table-row"  id="datatable-row-'.$row->id.'"  name="datatable_ids[]" value="'.$row->id.'" data-type="booking" onclick="dataTableRowCheck('.$row->id.',this)">';
@@ -344,7 +342,7 @@ public function commission(Request $request)
                 Booking::whereIn('id', $ids)->restore();
                 $message = 'Bulk Booking Restored';
                 break;
-
+                
             case 'permanently-delete':
                 Booking::whereIn('id', $ids)->forceDelete();
                 $message = 'Bulk Booking Permanently Deleted';
@@ -370,12 +368,12 @@ public function commission(Request $request)
 
         $bookingdata = Booking::find($id);
         $pageTitle = __('messages.update_form_title',['form'=> __('messages.booking')]);
-
+        
         if($bookingdata == null){
             $pageTitle = __('messages.add_button_form',['form' => __('messages.booking')]);
             $bookingdata = new Booking;
         }
-
+        
         return view('booking.create', compact('pageTitle' ,'bookingdata' ,'auth_user' ));
     }
 
@@ -386,22 +384,22 @@ public function commission(Request $request)
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {
+    {     
         $data = $request->all();
 
         if($request->id == null)
         {
             $data['status'] = !empty($data['status']) ? $data['status'] :'pending';
-        }
+        }       
         $data['date'] = isset($request->date) ? date('Y-m-d H:i:s',strtotime($request->date)) : date('Y-m-d H:i:s');
-        $service_data = Service::find($data['service_id']);
+        $service_data = Service::find($data['service_id']); 
 
         $data['provider_id'] = !empty($data['provider_id']) ? $data['provider_id']: $service_data->provider_id;
-
+       
         if($request->has('tax') && $request->tax != null) {
             $data['tax'] = json_encode($request->tax);
         }
-
+   
         if($request->coupon_id != null) {
             $coupons = Coupon::with('serviceAdded')->where('code',$request->coupon_id)
                 ->where('expire_date','>',date('Y-m-d H:i'))->where('status',1)
@@ -414,9 +412,9 @@ public function commission(Request $request)
                 $data['coupon_id'] = $coupons->id;
             }
         }
-
+                                                                        
         $result = Booking::updateOrCreate(['id' => $request->id], $data);
-
+       
         $activity_data = [
             'activity_type' => 'add_booking',
             'booking_id' => $result->id,
@@ -427,29 +425,29 @@ public function commission(Request $request)
 
         if($data['coupon_id'] != null) {
             $coupons = Coupon::find($data['coupon_id']);
-
+            
             $coupon_data = [
                 'booking_id'    => $result->id,
                 'code'          => $coupons->code,
                 'discount'      => $coupons->discount,
                 'discount_type' => $coupons->discount_type,
             ];
-
+            
             $result->couponAdded()->create($coupon_data);
         }
         if($request->has('booking_address_id') && $request->booking_address_id != null) {
             $booking_address_mapping = ProviderAddressMapping::find($data['booking_address_id']);
-
+            
             $booking_address_data = [
                 'booking_id'    => $result->id,
                 'address'          => $booking_address_mapping->address,
                 'latitude'      => $booking_address_mapping->latitude,
                 'longitude' => $booking_address_mapping->longitude,
             ];
-
+            
             $result->addressAdded()->create($booking_address_data);
         }
-
+        
         if ($request->has('service_addon_id') && is_array($request->service_addon_id) != null) {
             foreach ($request->service_addon_id as $serviceaddon) {
                 $booking_serviceaddon_mapping = ServiceAddon::find($serviceaddon);
@@ -460,13 +458,13 @@ public function commission(Request $request)
                         'name' => $booking_serviceaddon_mapping->name,
                         'price' => $booking_serviceaddon_mapping->price,
                     ];
-
+                    
                    $result->bookingAddonService()->create($booking_serviceaddon_data);
                 }
             }
         }
-
-
+        
+    
         if($request->has('booking_package') && $request->booking_package != null) {
             $booking_package = [
                'booking_id' => $result->id,
@@ -476,7 +474,7 @@ public function commission(Request $request)
                'is_featured' => $data['booking_package']['is_featured'],
                'package_type' => $data['booking_package']['package_type'],
                'price' => $data['booking_package']['price'],
-            ];
+            ]; 
             if(!empty($data['booking_package']['start_at'])){
                 $booking_package['start_at'] = $data['booking_package']['start_at'];
             }
@@ -536,15 +534,15 @@ public function commission(Request $request)
                      $notification->markAsRead();
                        }
                   }
-
+        
              }
-
+                  
         }
 
-
+    
         $bookingdata = Booking::with('bookingExtraCharge','payment')->myBooking()->find($id);
 
-
+       
         $tabpage = 'info';
         if (empty($bookingdata)) {
             $msg = __('messages.not_found_entry', ['name' => __('messages.booking')]);
@@ -569,7 +567,7 @@ public function commission(Request $request)
         $auth_user = authSession();
 
         $bookingdata = Booking::myBooking()->find($id);
-
+   
         $pageTitle = __('messages.update_form_title',['form'=> __('messages.booking')]);
         $relation = [
             'status' => BookingStatus::where('status',1)->orderBy('sequence','ASC')->get()->pluck('label', 'value'),
@@ -590,13 +588,13 @@ public function commission(Request $request)
             return  redirect()->back()->withErrors(trans('messages.demo_permission_denied'));
         }
         $data = $request->all();
-
-
+        
+        
         $data['date'] = isset($request->date) ? date('Y-m-d H:i:s',strtotime($request->date)) : date('Y-m-d H:i:s');
         $data['start_at'] = isset($request->start_at) ? date('Y-m-d H:i:s',strtotime($request->start_at)) : null;
         $data['end_at'] = isset($request->end_at) ? date('Y-m-d H:i:s',strtotime($request->end_at)) : null;
 
-
+        
         $bookingdata = Booking::find($id);
         $paymentdata = Payment::where('booking_id',$id)->first();
         if($data['status'] === 'hold'){
@@ -634,7 +632,7 @@ public function commission(Request $request)
                 'booking_id' => $id,
                 'booking' => $bookingdata,
             ];
-
+    
             saveBookingActivity($activity_data);
         }
         if($bookingdata->payment_id != null){
@@ -676,7 +674,7 @@ public function commission(Request $request)
         $booking = Booking::find($id);
 
         $msg = __('messages.msg_fail_to_delete',['item' => __('messages.booking')] );
-
+        
         if($booking != '') {
             Notification::whereJsonContains('data->id',$booking->id)->delete();
             $booking->delete();
@@ -721,7 +719,7 @@ public function commission(Request $request)
 
         if(!empty($remove_notification_id)){
             $search = "id".'":'.$bookingdata->id;
-
+            
             Notification::whereIn('notifiable_id',$remove_notification_id)
                 ->whereJsonContains('data->id',$bookingdata->id)
                 ->delete();
@@ -837,7 +835,7 @@ public function commission(Request $request)
                 $data  = view('booking.' . $tabpage, compact('tabpage', 'auth_user', 'bookingdata'))->render();
                 break;
         }
-        return response()->json($data);
+        return response()->json($data); 
     }
     public function createPDF($id)
     {
@@ -849,17 +847,17 @@ public function commission(Request $request)
 
     public function updateStatus(Request $request)
     {
-
+        
         switch ($request->type) {
             case 'payment':
                 $data = Payment::where('booking_id',$request->bookingId)->update(['payment_status'=>$request->status]);
                 break;
                 default:
-
+                
                 $data = Booking::find($request->bookingId)->update(['status'=>$request->status]);
                 break;
         }
-
+ 
         return comman_custom_response(['message'=> 'Status Updated' , 'status' => true]);
     }
 }

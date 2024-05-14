@@ -23,15 +23,6 @@ class Bank extends Model implements HasMedia
     public function providers(){
         return $this->belongsTo('App\Models\User','provider_id','id')->withTrashed();
     }
-    public function scopeMyBank($query){
-        $user = auth()->user();
-        if($user->hasRole('admin') || $user->hasRole('demo_admin')) {
-            $query =  $query;
-        }
 
-        if($user->hasRole('provider')) {
-            $query = $query->where('provider_id', $user->id);
-        }
-    }
 
 }

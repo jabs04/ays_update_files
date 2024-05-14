@@ -30,7 +30,7 @@ class ProviderAddressMappingController extends Controller
 
     public function index_data(DataTables $datatable,Request $request)
     {
-        $query = ProviderAddressMapping::query()->myAddress();
+        $query = ProviderAddressMapping::query();
         $filter = $request->filter;
 
         if (isset($filter)) {
@@ -41,7 +41,7 @@ class ProviderAddressMappingController extends Controller
         if (auth()->user()->hasAnyRole(['admin'])) {
             $query->newQuery();
         }
-
+        
         return $datatable->eloquent($query)
         ->addColumn('check', function ($row) {
             return '<input type="checkbox" class="form-check-input select-table-row"  id="datatable-row-'.$row->id.'"  name="datatable_ids[]" value="'.$row->id.'" onclick="dataTableRowCheck('.$row->id.')">';
@@ -59,7 +59,7 @@ class ProviderAddressMappingController extends Controller
         //     return ($query->provider_id != null && isset($query->providers)) ? '<a class="btn-link btn-link-hover" href='.route('provideraddress.create', ['id' => $query->id]).'>'.$query->providers->display_name.'</a>' : '-';
         // })
 
-        // ->editColumn('provider_id', function($query){
+        // ->editColumn('provider_id', function($query){                
         //     if (auth()->user()->can('provideraddress edit')) {
         //         $link = ($query->provider_id != null && isset($query->providers)) ? '<a class="btn-link btn-link-hover" href='.route('provideraddress.create', ['id' => $query->id]).'>'.$query->providers->display_name.'</a>' : '-';
         //     } else {
@@ -125,12 +125,12 @@ class ProviderAddressMappingController extends Controller
 
         $provideraddress = ProviderAddressMapping::find($id);
         $pageTitle = trans('messages.update_form_title',['form'=>trans('messages.provider_address')]);
-
+        
         if($provideraddress == null){
             $pageTitle = trans('messages.add_button_form',['form' => trans('messages.provider_address')]);
             $provideraddress = new ProviderAddressMapping;
         }
-
+        
         return view('provideraddress.create', compact('pageTitle' ,'provideraddress' ,'auth_user' ));
     }
 
@@ -144,7 +144,7 @@ class ProviderAddressMappingController extends Controller
             $coordinates = $result->first()->getCoordinates();
             $lat = $coordinates->getLatitude();
             $long = $coordinates->getLongitude();
-        }
+        } 
         return response()->json(['latitude' => $lat, 'longitude' => $long]);
     }
 
@@ -172,7 +172,7 @@ class ProviderAddressMappingController extends Controller
             return comman_message_response($message);
 		}
 
-        return redirect(route('provideraddress.index'))->withSuccess($message);
+        return redirect(route('provideraddress.index'))->withSuccess($message);   
     }
 
     /**
@@ -225,9 +225,9 @@ class ProviderAddressMappingController extends Controller
         }
         $provideraddress = ProviderAddressMapping::find($id);
         $msg = __('messages.msg_fail_to_delete',['item' => __('messages.provider_address')] );
-
-        if( $provideraddress!='') {
-
+        
+        if( $provideraddress!='') { 
+        
             $provideraddress->delete();
             $msg= __('messages.msg_deleted',['name' => __('messages.provider_address')] );
         }
