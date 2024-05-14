@@ -34,9 +34,7 @@ class ServiceController extends Controller
     // get datatable data
     public function index_data(DataTables $datatable,Request $request)
     {
-        $query = Service::query()->myService();
-
-
+        $query = Service::query();
 
         $filter = $request->filter;
 
