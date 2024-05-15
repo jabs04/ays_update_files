@@ -156,30 +156,30 @@ class SettingController extends Controller
                     $decodedata = json_decode($othersetting['value']);
 
                 
-                    $othersetting['social_login'] = $decodedata->social_login;
-                    $othersetting['google_login'] = $decodedata->google_login;
-                    $othersetting['apple_login'] = $decodedata->apple_login;
-                    $othersetting['otp_login'] = $decodedata->otp_login;
-                    $othersetting['post_job_request'] = $decodedata->post_job_request;
-                    $othersetting['blog'] = $decodedata->blog;
-                    $othersetting['maintenance_mode'] = $decodedata->maintenance_mode;
-                    $othersetting['force_update_user_app'] = $decodedata->force_update_user_app;
-                    $othersetting['user_app_minimum_version'] = $decodedata->user_app_minimum_version;
-                    $othersetting['user_app_latest_version'] = $decodedata->user_app_latest_version;
-                    $othersetting['force_update_provider_app'] = $decodedata->force_update_provider_app;
-                    $othersetting['provider_app_minimum_version'] = $decodedata->provider_app_minimum_version;
-                    $othersetting['provider_app_latest_version'] = $decodedata->provider_app_latest_version;
-                    $othersetting['force_update_admin_app'] = $decodedata->force_update_admin_app;
-                    $othersetting['admin_app_minimum_version'] = $decodedata->admin_app_minimum_version;
-                    $othersetting['admin_app_latest_version'] = $decodedata->admin_app_latest_version;
-                    $othersetting['advanced_payment_setting'] = $decodedata->advanced_payment_setting;
-                    $othersetting['wallet'] = $decodedata->wallet;
-                    $othersetting['enable_chat_gpt'] =  $decodedata->enable_chat_gpt;
-                    $othersetting['test_without_key'] =  $decodedata->test_without_key;
-                    $othersetting['chat_gpt_key'] =  $decodedata->chat_gpt_key;
-                    // $othersetting['maintenance_mode_secret_code'] = $decodedata->maintenance_mode_secret_code;
-                    
+                    $othersetting['social_login'] =  isset($decodedata->social_login) ? $decodedata->social_login : 1;
+                    $othersetting['google_login'] = isset($decodedata->google_login) ? $decodedata->google_login : 1; 
+                    $othersetting['apple_login'] = isset($decodedata->apple_login) ? $decodedata->apple_login : 1;
+                    $othersetting['otp_login'] = isset($decodedata->otp_login) ? $decodedata->otp_login : 1;
+                    $othersetting['post_job_request'] =  isset($decodedata->post_job_request) ? $decodedata->post_job_request : 1;
+                    $othersetting['blog'] =  isset($decodedata->blog) ? $decodedata->blog : 1;
+                    $othersetting['maintenance_mode'] = isset($decodedata->maintenance_mode) ? $decodedata->maintenance_mode : 0;
+                    $othersetting['force_update_user_app'] = isset($decodedata->force_update_user_app) ? $decodedata->force_update_user_app : 0;
+                    $othersetting['user_app_minimum_version'] =isset($decodedata->user_app_minimum_version) ? $decodedata->user_app_minimum_version : null; 
+                    $othersetting['user_app_latest_version'] =isset($decodedata->user_app_latest_version) ? $decodedata->user_app_latest_version : null;
+                    $othersetting['force_update_provider_app'] =isset($decodedata->force_update_provider_app) ? $decodedata->force_update_provider_app : 0; 
+                    $othersetting['provider_app_minimum_version'] = isset($decodedata->provider_app_minimum_version) ? $decodedata->provider_app_minimum_version : null;
+                    $othersetting['provider_app_latest_version'] = isset($decodedata->provider_app_latest_version) ? $decodedata->provider_app_latest_version : null;
+                    $othersetting['force_update_admin_app'] = isset($decodedata->force_update_admin_app) ? $decodedata->force_update_admin_app : 0;
+                    $othersetting['admin_app_minimum_version'] =isset($decodedata->admin_app_minimum_version) ? $decodedata->admin_app_minimum_version : null;
+                    $othersetting['admin_app_latest_version'] =isset($decodedata->admin_app_latest_version) ? $decodedata->admin_app_latest_version : null;
+                    $othersetting['advanced_payment_setting'] = isset($decodedata->advanced_payment_setting) ? $decodedata->advanced_payment_setting : 1;
+                    $othersetting['enable_chat_gpt'] =  isset($decodedata->enable_chat_gpt) ? $decodedata->enable_chat_gpt : 1;
+                    $othersetting['test_without_key'] = isset($decodedata->test_without_key) ? $decodedata->test_without_key : 1;
+                    $othersetting['chat_gpt_key'] = isset($decodedata->chat_gpt_key) ? $decodedata->chat_gpt_key : null;
+                    $othersetting['enable_auto_assign'] = isset($decodedata->enable_auto_assign) ? $decodedata->enable_auto_assign : 0;
+                
                 }
+                
 
                   
                 $data = view('setting.' . $page, compact('settings', 'page','othersetting'))->render();
@@ -692,7 +692,7 @@ class SettingController extends Controller
     $other_setting_data['enable_chat_gpt'] = (isset($data['enable_chat_gpt']) && $data['enable_chat_gpt'] == 'on') ? 1 : 0;
     $other_setting_data['test_without_key'] = (isset($data['test_without_key']) && $data['test_without_key'] == 'on') ? 1 : 0;
     $other_setting_data['chat_gpt_key'] =(isset($data['chat_gpt_key']) ) ? $data['chat_gpt_key']: null;
-    // $other_setting_data['maintenance_mode_secret_code'] =(isset($data['maintenance_mode_secret_code']) ) ? $data['maintenance_mode_secret_code']: null;
+    $other_setting_data['enable_auto_assign'] =(isset($data['enable_auto_assign']) && $data['enable_auto_assign'] == 'on') ? 1 : 0;
 
     // if($other_setting_data['maintenance_mode']==1){
 

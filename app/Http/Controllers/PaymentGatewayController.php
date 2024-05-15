@@ -113,6 +113,14 @@ class PaymentGatewayController extends Controller
                         }
                         $data  = view('paymentgateway.'.$tabpage, compact('user_data','tabpage','payment_data'))->render();
                       break;
+
+                    case 'midtrans':
+                        if(!empty($payment_data['value'])){
+                            $decodedata = json_decode($payment_data['value']);
+                            $payment_data['client_id'] = $decodedata->client_id;
+                        }
+                        $data  = view('paymentgateway.'.$tabpage, compact('user_data','tabpage','payment_data'))->render();
+                        break;
         
     
             default:
@@ -265,6 +273,11 @@ class PaymentGatewayController extends Controller
                             'salt_key' => $data['salt_key'],
                             'salt_index' => $data['salt_index'],
                           
+                        ];
+                    break;
+                    case 'midtrans':
+                        $config_data = [
+                            'client_id' => $data['client_id'],
                         ];
                     break;
     

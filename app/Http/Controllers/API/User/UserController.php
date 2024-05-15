@@ -266,6 +266,8 @@ class UserController extends Controller
 
         $service = [];
         $handyman_rating = [];
+        $handyman = [];
+        $profile_array = [];
 
         if($user->user_type == 'provider')
         {
@@ -275,7 +277,7 @@ class UserController extends Controller
             $handyman_rating = HandymanRatingResource::collection($handyman_rating);
             $handyman_staff = User::where('user_type','handyman')->where('provider_id',$id)->where('is_available',1)->get();
             $handyman = UserResource::collection($handyman_staff);
-            $profile_array = [];
+            
             if(!empty($handyman_staff)){
                 foreach ($handyman_staff as $image) {
                     $profile_array[] = $image->login_type !== null ? $image->social_image : getSingleMedia($image, 'profile_image',null);

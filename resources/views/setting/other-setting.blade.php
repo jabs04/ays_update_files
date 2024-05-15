@@ -210,6 +210,16 @@
     </div>
 </div>
 
+{{-- <div class="row">
+    <div class="form-group col-md-12 d-flex justify-content-between">
+        <label for="enable_auto_assign" class="mb-0">{{ __('messages.enable_auto_assign') }}</label>
+        <div class="custom-control custom-switch">
+            <input type="checkbox" class="custom-control-input" name="enable_auto_assign" id="enable_auto_assign" {{ !empty($othersetting->enable_auto_assign) ? 'checked' : '' }}>
+            <label class="custom-control-label" for="enable_auto_assign"></label>
+        </div>
+    </div>
+</div> --}}
+
 
 
 {{ Form::submit(__('messages.save'), ['class' => "btn btn-md btn-primary float-md-right"]) }}

@@ -696,6 +696,9 @@
         'user_invalid'=>'Invalid User',
         'enable_chat_gpt'=>'Enable ChatGPT',
         'test_without_key'=> 'Test Without Key',
+        'enable_auto_assign'=> 'Enable Auto Assign',
+        'midtrans' => 'Midtrans',
+        'client_id'=> 'Client Id',
         
         
     )
