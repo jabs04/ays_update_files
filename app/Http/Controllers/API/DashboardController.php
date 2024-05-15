@@ -45,6 +45,14 @@ class DashboardController extends Controller
         
         $per_page = 6;
 
+        if(!empty($request->customer_id)){
+            $user = User::find($request->customer_id);
+            if($user == null){
+                return comman_message_response( __('messages.user_invalid'),406);
+
+            }
+        }
+
         $slider = SliderResource::collection(Slider::where('status',1)->paginate($per_page));
 
         $category = CategoryResource::collection(Category::where('status',1)->where('is_featured',1)->orderBy('name','asc')->paginate(8));
@@ -566,7 +574,7 @@ class DashboardController extends Controller
 
             $response = [
                 'configurations' => $configurations,
-                'notification_unread_count' => $notification,
+'notification_unread_count' => $notification,
                 'subscription'  => $active_plan,
                 'is_subscribed' => is_subscribed_user($user->id),
                 'payment_settings' => $payment_settings,

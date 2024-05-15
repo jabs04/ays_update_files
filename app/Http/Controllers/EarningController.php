@@ -31,7 +31,7 @@ class EarningController extends Controller
             // ->whereNotNull('payment_id')
             // ->get();
             $bookings = Booking::where('provider_id',$provider->id)->whereNotNull('payment_id')->get();
-            
+
             $booking_data = get_provider_commission($bookings);
 
             $providerEarning = ProviderPayout::where('provider_id',$provider->id)->sum('amount') ?? 0;
@@ -84,9 +84,9 @@ class EarningController extends Controller
             //     'total_bookings' => $bookings->count(),
             //     'total_earning' => $totalearning,
             //     'taxes' => getPriceFormat($booking_data['tax']),
-            //     'admin_earning' => $adminearning,
-            //     'provider_earning' => $providerearning,
-            //     'provider_earning_formate' => $provider_earning['number_format'],
+                //     'admin_earning' => $adminearning,
+                //     'provider_earning' => $providerearning,
+                //     'provider_earning_formate' => $provider_earning['number_format'],
             // ];
 
         }
@@ -129,9 +129,28 @@ class EarningController extends Controller
             ->make(true);
         }
         if($request->is('api/*')) {
+
+            $earningData[] = [
+                'provider_id' => $provider->id,
+                'provider_name' => $provider->display_name,
+                'email' => $provider->email,
+                'commission' => optional($provider->providertype)->commission,
+                'commission_type' => optional($provider->providertype)->type,
+                'total_bookings' => $bookings->count(),
+                'total_earning' =>round($totalearning, 2),
+                'taxes' =>  round($booking_data['tax'], 2),
+                'admin_earning' => round($adminearning, 2),
+                'provider_earning' => round($providerearning, 2),
+                'provider_earning_formate' =>round($provider_earning['number_format'],2),
+            ];
             return comman_custom_response($earningData);
 		}
     }
+
+
+
+
+
     public function handymanEarning(){
         $pageTitle =  __('messages.earning');
         return view('earning.handyman',compact('pageTitle'));

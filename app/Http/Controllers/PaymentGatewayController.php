@@ -102,9 +102,19 @@ class PaymentGatewayController extends Controller
                     }
                     $data  = view('paymentgateway.'.$tabpage, compact('user_data','tabpage','payment_data'))->render();
                     break;
+
+                    case 'phonepe':
+                        if(!empty($payment_data['value'])){
+                            $decodedata = json_decode($payment_data['value']);
+                            $payment_data['app_id'] = $decodedata->app_id;
+                            $payment_data['merchant_id'] = $decodedata->merchant_id;
+                            $payment_data['salt_key'] = $decodedata->salt_key;
+                            $payment_data['salt_index'] = $decodedata->salt_index;
+                        }
+                        $data  = view('paymentgateway.'.$tabpage, compact('user_data','tabpage','payment_data'))->render();
+                      break;
+        
     
-
-
             default:
                 $data  = view('paymentgateway.'.$tabpage,compact('tabpage','payment_data'))->render();
                 break;
@@ -247,7 +257,17 @@ class PaymentGatewayController extends Controller
                         'secret_key' => $data['secret_key'],
                       
                     ];
+
+                    case 'phonepe':
+                        $config_data = [
+                            'app_id' => $data['app_id'],
+                            'merchant_id' => $data['merchant_id'],
+                            'salt_key' => $data['salt_key'],
+                            'salt_index' => $data['salt_index'],
+                          
+                        ];
                     break;
+    
             default:
                 $config_data = [];
                 break;

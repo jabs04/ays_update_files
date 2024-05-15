@@ -90,7 +90,6 @@
         'login_success'=>'You have successfully logged in.',
         'dashboard_no' => 'Dashboard :No',
         'main' => 'Main',
-
         'valid_password' => 'Current password do not match.',
         'active' => 'Active',
         'inactive' => 'Inactive',
@@ -170,7 +169,6 @@
         'view_all' => 'View all',
         'you_unread_notification' => 'You have :number unread notifications',
         'mark_all_as_read' => 'Mark All as Read',
-
         'booking_detail'=>'Booking Details',
         'by'=>'By',
         'duration'=>'Duration',
@@ -688,7 +686,15 @@
         'airtel_money'=>'Airtel Money',
         'client_id'=>'Client ID',
         'secret_key'=>'Secret Key',
-        'enable_otp_login'=>'OTP Login'
+        'enable_otp_login'=>'OTP Login',
+        'paystack'=>'Paystack',
+        'phonepe'=>'PhonePe',
+        'app_id'=>'App Id',
+        'merchant_id'=>'Merchant Id',
+        'salt_key'=>'Salt Key',
+        'salt_index'=>'Salt Index',
+        'user_invalid'=>'Invalid User'
+        
         
     )
     ?>

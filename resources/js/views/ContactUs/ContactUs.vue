@@ -59,7 +59,7 @@
                                     <i class="fab fa-linkedin-in"></i>
                                     </a>
                                 </li>
-                                <li>
+                              
                                 <li v-if="generalsetting.instagram_url">
                                     <a :href="generalsetting.instagram_url" class="insta-footer" target="_blank">
                                     <i class="fab fa-instagram"></i>
