@@ -20,7 +20,7 @@ class BookingResource extends JsonResource
                 $extraValue += $chrage->price * $chrage->qty;
             }
         }
-     
+
         return [
             'id'                    => $this->id,
             'address'               => $this->address,
@@ -44,21 +44,21 @@ class BookingResource extends JsonResource
             'customer_name'         => optional($this->customer)->display_name,
             'service_name'          => optional($this->service)->name,
             'handyman'              => isset($this->handymanAdded) ? $this->handymanAdded : [],
-            'service_attchments'    => getAttachments(optional($this->service)->getMedia('service_attachment'),null),
+            'service_attchments'    => getAttachments(  optional($this->service)->getMedia('service_attachment') ?? [], null),
             'duration_diff'         => $this->duration_diff,
             'booking_address_id'    => $this->booking_address_id,
-            'duration_diff_hour'    => ($this->service->type === 'hourly') ? convertToHoursMins($this->duration_diff) : null,
+            'duration_diff_hour'    => (optional($this->service)->type === 'hourly') ? convertToHoursMins($this->duration_diff) : null,
             'taxes'                 => json_decode($this->tax,true),
             'quantity'              => $this->quantity,
             'coupon_data'           => isset($this->couponAdded) ? $this->couponAdded : null,
             'total_amount'          => $this->total_amount,
-            'total_rating'          => (float) number_format(max(optional($this->service)->serviceRating->avg('rating'),0), 2),
+            'total_rating' => (float) number_format(max(optional(optional($this->service)->serviceRating)->avg('rating') ?? 0, 0),2),
             'amount'                => $this->amount,
             'extra_charges'         => BookingChargesResource::collection($this->bookingExtraCharge),
             'extra_charges_value'            => $extraValue,
             'booking_type'            => $this->type,
             'booking_slot' => $this->booking_slot,
-            'total_review' => optional($this->service)->serviceRating->count(),
+            'total_review' => optional(optional($this->service)->serviceRating)->count() ?? 0,
             'booking_package'              => new BookingPackageResource($this->bookingPackage),
             'advance_paid_amount'  => $this->advance_paid_amount == null ? 0:(double) $this->advance_paid_amount,
             'advance_payment_amount' => optional($this->service)->advance_payment_amount == null ? 0:(bool) optional($this->service)->advance_payment_amount,

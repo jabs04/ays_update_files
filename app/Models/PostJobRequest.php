@@ -4,11 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
 
-class PostJobRequest extends Model
+class PostJobRequest extends Model implements  HasMedia
 {
-    use HasFactory;
+    use InteractsWithMedia,HasFactory;
     protected $table = 'post_job_requests';
     protected $fillable = [
         'title', 'customer_id', 'status' ,'description','provider_id','reason','price','date','job_price'

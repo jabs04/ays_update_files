@@ -236,6 +236,7 @@ class User extends Authenticatable implements HasMedia
     public function playerids(){
         return $this->hasMany(UserPlayerIds::class, 'user_id','id');
     }
+
     public function scopeList($query)
     {
         return $query->orderBy('updated_at', 'desc');

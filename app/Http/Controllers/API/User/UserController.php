@@ -129,7 +129,9 @@ class UserController extends Controller
                 ];
                 UserPlayerIds::create($data);
 
+            
             }
+            
             $success = $user;
             $success['user_role'] = $user->getRoleNames();
             $success['api_token'] = $user->createToken('auth_token')->plainTextToken;
@@ -382,6 +384,7 @@ class UserController extends Controller
             }
            
         }
+
         $message = __('messages.updated');
         $user_data['profile_image'] = getSingleMedia($user_data,'profile_image',null);
         $user_data['user_role'] = $user->getRoleNames();
@@ -408,6 +411,8 @@ class UserController extends Controller
                 return comman_message_response('Logout successfully');
             }
         }
+
+    
         return comman_message_response('Logout successfully');
 
     }

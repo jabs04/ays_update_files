@@ -135,7 +135,7 @@ class PostJobRequestController extends Controller
         $data['customer_id'] =  !empty($request->customer_id) ? $request->customer_id : auth()->user()->id; 
 
         $result = PostJobRequest::updateOrCreate(['id' => $request->id], $data);
-
+        storeMediaFile($result,$request->post_job_image, 'post_job_image');
         $activity_data = [
             'activity_type' => 'job_requested',
             'post_job_id' => $result->id,
@@ -149,15 +149,17 @@ class PostJobRequestController extends Controller
         {
             $result->postServiceMapping()->delete();
         }
-
-        if($request->service_id != null) {
-            foreach($request->service_id as $service) {
-                $post_services = [
-                    'post_request_id'   => $result->id,
-                    'service_id'   => $service,
-                ];
-                $result->postServiceMapping()->insert($post_services);
-            }
+        if ($request->has('service_id') && is_string($request->service_id)) {
+            $serviceIdsArray = json_decode($request->service_id, true);
+            if (is_array($serviceIdsArray)) {
+                foreach ($serviceIdsArray as $service) {
+                    $post_services = [
+                        'post_request_id' => $result->id,
+                        'service_id' => $service,
+                    ];
+                    $result->postServiceMapping()->insert($post_services);
+                }
+            } 
         }
         if($request->status == 'accept'){
             $activity_data = [

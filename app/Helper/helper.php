@@ -80,7 +80,7 @@ function checkRolePermission($role,$permission){
 }
 
 function demoUserPermission(){
-    if(\Auth::user()->hasAnyRole(['demo_admin'])){
+    if(\Auth::user()->hasAnyRole(['provider','handyman','user']) && !request()->is('api/*')){
         return true;
     }else{
         return false;
@@ -229,7 +229,8 @@ function saveBookingActivity($data)
                     'provider_id' => $data['booking']->provider_id,
                     'provider_name' => isset($data['booking']->provider) ? $data['booking']->provider->display_name : '',
                 ];
-                $sendTo = ['admin' , 'provider'];
+            
+               $sendTo = ['admin' , 'provider'];
             break;
         case "assigned_booking":
                 $assigned_handyman = handymanNames($data['booking']->handymanAdded);
@@ -240,7 +241,7 @@ function saveBookingActivity($data)
                     'handyman_id' => $data['booking']->handymanAdded->pluck('handyman_id'),
                     'handyman_name' => $data['booking']->handymanAdded,
                 ];
-                $sendTo = ['handyman'];
+                $sendTo = ['handyman','user','admin'];
                 break;
 
         case "transfer_booking":
@@ -276,7 +277,9 @@ function saveBookingActivity($data)
             $old_status = \App\Models\BookingStatus::bookingStatus($data['booking']->old_status);
             $data['activity_type'] = __('messages.cancel_booking');
 
-            $data['activity_message'] = __('messages.cancel_booking');
+            $data['activity_message'] = __('messages.cancel_booking_message',['name' =>$role]);
+
+    
             $activity_data = [
                 'reason' => $data['booking']->reason,
                 'status' => $data['booking']->status,
@@ -323,12 +326,15 @@ function saveBookingActivity($data)
                 break;
             case 'handyman':
                 $handymans = $data['booking']->handymanAdded->pluck('handyman_id');
-                foreach($handymans as $id)
-                {
-                    $user = \App\Models\User::getUserByKeyValue( 'id', $id );
-                    sendNotification('provider',$user,$notification_data);
-                }
-                break;
+                 foreach($handymans as $id)
+                 {
+                     $user = \App\Models\User::getUserByKeyValue( 'id', $id );
+                     if($user->user_type !='provider'){
+                         sendNotification('provider',$user,$notification_data);
+                     }
+                     
+                 }
+               break;
             case 'user':
                     $user = \App\Models\User::getUserByKeyValue( 'id', $data['booking']->customer_id );
                 break;
@@ -1136,6 +1142,17 @@ function default_earning_type(){
     return $earningtype;
 }
 
+function default_notification_type(){
+    $othersetting = \App\Models\Setting::where('type','OTHER_SETTING')->first();
+
+    $decodedata = json_decode($othersetting['value']);
+
+    $notification_type = isset($decodedata->notification_type) ? $decodedata->notification_type : null;
+
+    return $notification_type;
+}
+
+
 function saveWalletHistory($data){
  
     $admin = \App\Models\AppSetting::first();
@@ -1290,6 +1307,9 @@ function get_provider_plan_limit($provider_id,$type){
 }
 
 function sendNotification($type,$user,$data){
+    
+ if(default_notification_type()=='onesignal_notification'){
+
     $app_id = ENV('ONESIGNAL_API_KEY');
     $rest_api_key = ENV('ONESIGNAL_REST_API_KEY');
     if($type === 'user'){
@@ -1332,13 +1352,62 @@ function sendNotification($type,$user,$data){
     
     $response = curl_exec($ch);
     curl_close($ch);
-    $childData = array(
-        "id"=> $data['id'],
-        "type"=>$data['type'],
-        "subject"=>$data['subject'],
-        "message"=>$data['message'],
-        'notification-type' => $data['notification-type']
-    );
+    
+   }else if(default_notification_type()=='firebase_notification'){
+
+     $othersetting = \App\Models\Setting::where('type','OTHER_SETTING')->first();
+
+     $decodedata = json_decode($othersetting['value']);
+
+     $apiKey= isset($decodedata->firebase_key) ? $decodedata->firebase_key : null;
+
+     $apiUrl = 'https://fcm.googleapis.com/fcm/send';
+     $apiKey =$apiKey;
+
+     $headers = [
+         'Authorization: key=' . $apiKey,
+         'Content-Type: application/json',
+     ];
+
+     $heading   ='#'.$data['id'].' '.str_replace("_"," ",ucfirst($data['subject']));
+     $content   = $data['message'];
+
+    
+     $firebase_data = [
+          'to'=>'/topics/user_'.$user->id,
+
+        // 'registration_ids' => $tokens,
+         'collapse_key' => 'type_a',
+         'notification' => [
+             'body' =>   $content,
+             'title' => $heading ,
+         ],
+         'data' => [
+            'type' => $data['type'],
+            'id' => $data['id']
+         ],
+     ];
+     
+     $ch = curl_init($apiUrl);
+     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($firebase_data));
+     
+     $response = curl_exec($ch);
+
+     curl_close($ch);
+     
+   }
+       
+      $childData = array(
+      "id"=> $data['id'],
+       "type"=>$data['type'],
+       "subject"=>$data['subject'],
+       "message"=>$data['message'],
+       'notification-type' => $data['notification-type']
+      );
+
     $notification = \App\Models\Notification::create(
         array(
             'id' => Illuminate\Support\Str::random(32),
@@ -1371,47 +1440,107 @@ function sendNotification($type,$user,$data){
         ->orderBy("distance",'asc')
         ->get();
 
-        if (!$providers->isEmpty()) {
-            $providerPlayerIds = $providers->pluck('providers.player_id')->toArray();
+        $heading      = array(
+            "en" =>  __('messages.post_request_title')
+        );
+        $content      = array(
+            "en" =>  __('messages.post_request_message',['customer' =>$data['post_job']->customer->display_name ])
+        );
 
-           } else {
-            $providerPlayerIds = \App\Models\User::where('user_type', 'provider')->where('status', 1)->pluck('player_id')->toArray();     
-          }
-    $heading      = array(
-        "en" =>  __('messages.post_request_title')
-    );
-    $content      = array(
-        "en" =>  __('messages.post_request_message',['customer' =>$data['post_job']->customer->display_name ])
-    );
-    $fields = array(
-        'app_id' => ENV('ONESIGNAL_ONESIGNAL_APP_ID_PROVIDER'),
-        'include_player_ids' => $providerPlayerIds,
-        'data' =>  array(
+        $data = array(
             'post_request_id' => $data['post_job_id'],
             'post_job_name' => $data['post_job']->title,
             'customer_id' => $data['post_job']->customer_id,
             'customer_name' => isset($data['post_job']->customer) ? $data['post_job']->customer->display_name : '',
             'notification-type' =>'post_Job'
-        ),
-        'headings' => $heading,
-        'contents' => $content,
-    );
-    $fields = json_encode($fields);
-    $rest_api_key = ENV('ONESIGNAL_ONESIGNAL_REST_API_KEY_PROVIDER');
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
-    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-        'Content-Type: application/json; charset=utf-8',
-        "Authorization:Basic $rest_api_key"
-    ));
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-    curl_setopt($ch, CURLOPT_HEADER, FALSE);
-    curl_setopt($ch, CURLOPT_POST, TRUE);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-    
-    $response = curl_exec($ch);
-    curl_close($ch);
+        );
+
+     if(default_notification_type()=='onesignal_notification'){
+
+        if(!$providers->isEmpty()) {
+            $providerPlayerIds = $providers->pluck('providers.player_id')->toArray();
+
+           } else {
+            $providerPlayerIds = \App\Models\User::where('user_type', 'provider')->where('status', 1)->pluck('player_id')->toArray();     
+          }
+
+         $fields = array(
+             'app_id' => ENV('ONESIGNAL_ONESIGNAL_APP_ID_PROVIDER'),
+             'include_player_ids' => $providerPlayerIds,
+             'data' =>  $data,
+             'headings' => $heading,
+             'contents' => $content,
+         );
+         $fields = json_encode($fields);
+         $rest_api_key = ENV('ONESIGNAL_ONESIGNAL_REST_API_KEY_PROVIDER');
+         $ch = curl_init();
+         curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
+         curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+             'Content-Type: application/json; charset=utf-8',
+             "Authorization:Basic $rest_api_key"
+         ));
+         curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+         curl_setopt($ch, CURLOPT_HEADER, FALSE);
+         curl_setopt($ch, CURLOPT_POST, TRUE);
+         curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
+         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+         
+         $response = curl_exec($ch);
+         curl_close($ch);
+     
+     }else if(default_notification_type()=='firebase_notification'){
+
+       
+        if(!$providers->isEmpty()) {
+            
+            $providerIds = $providers->pluck('provider_id')->toArray();
+
+           } else {
+            $providerIds = \App\Models\User::where('user_type', 'provider')->where('status', 1)->pluck('id')->toArray();     
+          }
+
+          $othersetting = \App\Models\Setting::where('type','OTHER_SETTING')->first();
+          $decodedata = json_decode($othersetting['value']);
+     
+          $apiKey= isset($decodedata->firebase_key) ? $decodedata->firebase_key : null;
+  
+     
+          $apiUrl = 'https://fcm.googleapis.com/fcm/send';
+          $apiKey =$apiKey;
+     
+          $headers = [
+              'Authorization: key=' . $apiKey,
+              'Content-Type: application/json',
+          ];
+
+     foreach($providerIds as $provider_id){
+
+        $firebase_data = [
+
+            'to'=>'/topics/user_'.$provider_id,
+            'collapse_key' => 'type_a',
+            'notification' => [
+                
+                'title' => $heading['en'],
+                'body' => $content['en'],
+            ],
+            'data' =>$data,
+            
+        ];
+         
+          $ch = curl_init($apiUrl);
+          curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+          curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+          curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+          curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($firebase_data));
+          
+          $response = curl_exec($ch);
+     
+          curl_close($ch);
+        
+       }
+   
+    }
 
 }
 

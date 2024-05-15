@@ -177,6 +177,8 @@ class SettingController extends Controller
                     $othersetting['test_without_key'] = isset($decodedata->test_without_key) ? $decodedata->test_without_key : 1;
                     $othersetting['chat_gpt_key'] = isset($decodedata->chat_gpt_key) ? $decodedata->chat_gpt_key : null;
                     $othersetting['enable_auto_assign'] = isset($decodedata->enable_auto_assign) ? $decodedata->enable_auto_assign : 0;
+                    $othersetting['notification_type'] = isset($decodedata->notification_type) ? $decodedata->notification_type : null;
+                    $othersetting['firebase_key'] = isset($decodedata->firebase_key) ? $decodedata->firebase_key : null;
                 
                 }
                 
@@ -527,12 +529,16 @@ class SettingController extends Controller
             $data['type'] = 0;
             $data['service_id'] = 0;
         }
+
         $heading      = array(
             "en" => $data['title']
         );
         $content      = array(
             "en" => $data['description']
         );
+
+     if(default_notification_type()=='onesignal_notification'){
+
         if($data['is_type'] == 'provider'){
           
             $fields = array(
@@ -581,6 +587,67 @@ class SettingController extends Controller
 
         $response = curl_exec($ch);
         curl_close($ch);
+
+     }elseif(default_notification_type()=='firebase_notification'){
+
+        $othersetting = \App\Models\Setting::where('type','OTHER_SETTING')->first();
+
+        $decodedata = json_decode($othersetting['value']);
+   
+        $apiKey= isset($decodedata->firebase_key) ? $decodedata->firebase_key : null;
+   
+        $apiUrl = 'https://fcm.googleapis.com/fcm/send';
+        $apiKey =$apiKey;
+   
+        $headers = [
+            'Authorization: key=' . $apiKey,
+            'Content-Type: application/json',
+        ];
+
+
+     if($data['is_type'] == 'provider'){
+
+          $firebase_data = [
+              'to'=>'/topics/providerApp',
+              'collapse_key' => 'type_a',
+              'notification' => [
+                  'title' => $heading['en'],
+                  'body' => $content['en'],
+              ],
+              'data' => [
+                 'type' => $data['type'],
+                 'service_id' => $data['service_id']
+              ],
+          ];
+        }else{
+
+            $firebase_data = [
+                'to'=>'/topics/userApp',
+                'collapse_key' => 'type_a',
+                'notification' => [
+                    'title' => $heading['en'],
+                    'body' => $content['en'],
+                ],
+                'data' => [
+                   'type' => $data['type'],
+                   'service_id' => $data['service_id']
+                ],
+            ];
+
+        }
+        
+        $ch = curl_init($apiUrl);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($firebase_data));
+        
+        $response = curl_exec($ch);
+
+        curl_close($ch);
+
+        }
+
         if ($response) {
             $message = trans('messages.update_form', ['form' => trans('messages.pushnotification_settings')]);
         } else {
@@ -693,6 +760,9 @@ class SettingController extends Controller
     $other_setting_data['test_without_key'] = (isset($data['test_without_key']) && $data['test_without_key'] == 'on') ? 1 : 0;
     $other_setting_data['chat_gpt_key'] =(isset($data['chat_gpt_key']) ) ? $data['chat_gpt_key']: null;
     $other_setting_data['enable_auto_assign'] =(isset($data['enable_auto_assign']) && $data['enable_auto_assign'] == 'on') ? 1 : 0;
+    $other_setting_data['notification_type'] =(isset($data['notification_type']) ) ? $data['notification_type']: null;
+    $other_setting_data['firebase_key'] =(isset($data['firebase_key']) ) ? $data['firebase_key']: null;
+
 
     // if($other_setting_data['maintenance_mode']==1){
 

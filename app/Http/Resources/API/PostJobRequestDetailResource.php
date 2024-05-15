@@ -41,6 +41,7 @@ class PostJobRequestDetailResource extends JsonResource
             'can_bid'           =>  $can_bid,
             'service'           => ServiceResource::collection(Service::whereIn('id',$this->postServiceMapping->pluck('service_id'))->get()),
             'job_price'             => $this->job_price,
+            'post_job_image'  => getSingleMedia($this, 'post_job_image',null),
         ];
     }
 }
