@@ -161,6 +161,10 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('user-favourite-provider',[ API\ProviderFavouriteController::class, 'getUserFavouriteProvider' ]);
     Route::post('download-invoice',[API\CommanController::class,'downloadInvoice']);
     Route::get('user-wallet-balance',[API\User\UserController::class,'userWalletBalance']);
+
+    Route::post('service-addon-save', [ App\Http\Controllers\ServiceAddonController::class, 'store' ] );
+    Route::post('service-addon-delete/{id}', [ App\Http\Controllers\ServiceAddonController::class, 'destroy' ] );
+    Route::get('service-addon-list', [ API\ServiceAddonController::class, 'getServiceAddonList' ] );
     
 
 

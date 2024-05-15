@@ -3,9 +3,8 @@
     $auth_user= authSession();
 ?>
 {{ Form::open(['route' => ['serviceaddon.destroy', $serviceaddon->id], 'method' => 'delete','data--submit'=>'serviceaddon'.$serviceaddon->id]) }}
-@if(auth()->user()->hasAnyRole(['admin']))
+@if(auth()->user()->hasAnyRole(['admin','provider']))
 <div class="d-flex justify-content-end align-items-center">
-        <a class="mr-2" href="{{ route('serviceaddon.create',['id' => $serviceaddon->id]) }}" title="{{ __('messages.update_form_title',['form' => __('messages.service_addon') ]) }}"><i class="fas fa-pen text-secondary"></i></a>
         <a class="mr-2" href="{{ route('serviceaddon.destroy', $serviceaddon->id) }}" data--submit="serviceaddon{{$serviceaddon->id}}" 
             data--confirmation='true' 
             data--ajax="true"

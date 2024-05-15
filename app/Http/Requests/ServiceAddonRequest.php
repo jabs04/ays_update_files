@@ -37,6 +37,15 @@ class ServiceAddonRequest extends FormRequest
     }
     protected function failedValidation(Validator $validator)
     {
+        if ( request()->is('api*')){
+            $data = [
+                'status' => 'false',
+                'message' => $validator->errors()->first(),
+                'all_message' =>  $validator->errors()
+            ];
+            
+            throw new HttpResponseException(response()->json($data,422));
+        }
 
         throw new HttpResponseException(redirect()->back()->withInput()->with('errors', $validator->errors()));
     }

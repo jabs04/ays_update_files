@@ -29,13 +29,22 @@
                             <div class="form-group col-md-4">
                                 {{ Form::label('name', __('messages.select_name',[ 'select' => __('messages.service') ]).' <span class="text-danger">*</span>',['class'=>'form-control-label'],false) }}
                                 <br />
+                                @php
+                                    if($auth_user->user_type == 'admin')
+                                    {
+                                        $route = route('ajax-list', ['type' => 'service-list']);
+                                    } else {
+                                        $route = route('ajax-list', ['type' => 'service-list', 'provider_id' => $auth_user->id]);
+                                    }
+                                
+                                @endphp
                                 {{ Form::select('service_id', [ optional($serviceaddon->service)->id => optional($serviceaddon->service)->name ], optional($serviceaddon->service)->id, [
                                         'class' => 'select2js form-group service',
                                         'id' => 'service_id',
                                         'required',
                                         'data-placeholder' => __('messages.select_name',[ 'select' => __('messages.service') ]),
-                                            'data-ajax--url' => route('ajax-list', ['type' => 'service-list']),
-                                ]) }}  
+                                        'data-ajax--url' => $route,
+                                ]) }} 
                                 
                             </div>
                             <div class="form-group col-md-4">
@@ -45,7 +54,7 @@
                             </div>
 
                             <div class="form-group col-md-4">
-                                <label class="form-control-label" for="serviceaddon_image">{{ __('messages.image') }} <span class="text-danger">*</span></label>
+                                <label class="form-control-label" for="serviceaddon_image">{{ __('messages.image') }}</label>
                                 <div class="custom-file">
                                     <input type="file" name="serviceaddon_image" class="custom-file-input" accept="image/*">
                                     <label class="custom-file-label upload-label">{{  __('messages.choose_file',['file' =>  __('messages.image') ]) }}</label>
@@ -75,7 +84,7 @@
                                 <small class="help-block with-errors text-danger"></small>
                             </div>  -->
                             <div class="form-group col-md-4">
-                                {{ Form::label('status',__('messages.status').' <span class="text-danger">*</span>',['class'=>'form-control-label'],false) }}
+                                {{ Form::label('status',__('messages.status').' ',['class'=>'form-control-label'],false) }}
                                 {{ Form::select('status',['1' => __('messages.active') , '0' => __('messages.inactive') ],old('status'),[ 'id' => 'role' ,'class' =>'form-control select2js','required']) }}
                             </div>
 

@@ -27,7 +27,7 @@ class ServiceAddonController extends Controller
     }
     public function index_data(DataTables $datatable,Request $request)
     {
-        $query = ServiceAddon::query();
+        $query = ServiceAddon::query()->ServiceAddon();
 
         $filter = $request->filter;
 
@@ -131,17 +131,23 @@ class ServiceAddonController extends Controller
             return  redirect()->back()->withErrors(trans('messages.demo_permission_denied'));
         }
         $data = $request->all();
+
+        $data['created_by'] = auth()->user()->id;
        
         $result = ServiceAddon::updateOrCreate(['id' => $data['id'] ],$data);
         
-        storeMediaFile($result,$request->serviceaddon_image, 'serviceaddon_image');
+            storeMediaFile($result,$request->serviceaddon_image, 'serviceaddon_image');
+        
 
         $message = trans('messages.update_form',['form' => trans('messages.service_addon')]);
         if($result->wasRecentlyCreated){
             $message = trans('messages.save_form',['form' => trans('messages.service_addon')]);
         }
         if($request->is('api/*')) {
-            return comman_message_response($message);
+            $response = [
+                'message'=>$message,
+            ];
+            return comman_custom_response($response);
 		}
         return redirect(route('serviceaddon.index'))->withSuccess($message); 
     }
@@ -198,6 +204,9 @@ class ServiceAddonController extends Controller
         if($serviceaddon != '') { 
             $serviceaddon->delete();
             $msg= __('messages.msg_deleted',['name' => __('messages.service_addon')] );
+        }
+        if(request()->is('api/*')){
+            return comman_custom_response(['message'=> $msg , 'status' => true]);
         }
         return comman_custom_response(['message'=> $msg, 'status' => true]);
     }

@@ -693,7 +693,9 @@
         'merchant_id'=>'Merchant Id',
         'salt_key'=>'Salt Key',
         'salt_index'=>'Salt Index',
-        'user_invalid'=>'Invalid User'
+        'user_invalid'=>'Invalid User',
+        'enable_chat_gpt'=>'Enable ChatGPT',
+        'test_without_key'=> 'Test Without Key',
         
         
     )

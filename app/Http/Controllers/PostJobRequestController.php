@@ -140,6 +140,8 @@ class PostJobRequestController extends Controller
             'activity_type' => 'job_requested',
             'post_job_id' => $result->id,
             'post_job' => $result,
+            'latitude' =>isset($data['latitude']) ? $data['latitude'] : 0.0,
+            'longitude' => isset($data['longitude']) ? $data['longitude'] : 0.0,
         ];
 
         saveRequestJobActivity($activity_data);
@@ -162,6 +164,8 @@ class PostJobRequestController extends Controller
                 'activity_type' => 'user_accept_bid',
                 'post_job_id' => $result->id,
                 'post_job' => $result,
+                'latitude' =>isset($data['latitude']) ? $data['latitude'] : 0.0,
+                'longitude' => isset($data['longitude']) ? $data['longitude'] : 0.0,
             ];
     
             saveRequestJobActivity($activity_data);

@@ -257,7 +257,7 @@ class PaymentGatewayController extends Controller
                         'secret_key' => $data['secret_key'],
                       
                     ];
-
+                    break;
                     case 'phonepe':
                         $config_data = [
                             'app_id' => $data['app_id'],

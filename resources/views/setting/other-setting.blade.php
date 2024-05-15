@@ -182,6 +182,34 @@
     </div>
 </div>
 
+<div class="row">
+    <div class="form-group col-md-12 d-flex justify-content-between">
+        <label for="enable_chat_gpt" class="mb-0">{{ __('messages.enable_chat_gpt') }}</label>
+        <div class="custom-control custom-switch">
+            <input type="checkbox" class="custom-control-input" name="enable_chat_gpt" id="enable_chat_gpt" {{ !empty($othersetting->enable_chat_gpt) ? 'checked' : '' }}>
+            <label class="custom-control-label" for="enable_chat_gpt"></label>
+        </div>
+    </div>
+</div>
+
+<div class="form-padding-box mb-3" id='chat_gpt_key_section'>
+    <div class="row">
+    <div class="form-group col-md-12 d-flex justify-content-between">
+        <label for="test_without_key" class="mb-0">{{ __('messages.test_without_key') }}</label>
+        <div class="custom-control custom-switch">
+            <input type="checkbox" class="custom-control-input" name="test_without_key" id="test_without_key" {{ !empty($othersetting->test_without_key) ? 'checked' : '' }}>
+            <label class="custom-control-label" for="test_without_key"></label>
+        </div>
+    </div>
+    <div class="form-group col-sm-6 mb-0" id='key'>
+            {{ Form::label('key',trans('messages.key').' ',['class'=>'form-control-label'], false ) }}
+            {{ Form::text('chat_gpt_key', null, ['class'=>"form-control" ,'id'=>'chat_gpt_key', 'placeholder'=>__('messages.key') ]) }}
+            <small class="help-block with-errors text-danger"></small>
+        </div>
+        
+    </div>
+</div>
+
 
 
 {{ Form::submit(__('messages.save'), ['class' => "btn btn-md btn-primary float-md-right"]) }}
@@ -285,6 +313,37 @@ function checkOtherSettingOption(value){
         $('#social_login_data').removeClass('d-none');
     }else{
         $('#social_login_data').addClass('d-none');
+    }
+}
+var enable_chat_gpt = $("input[name='enable_chat_gpt']").prop('checked');
+
+checkChatGPTSetting(enable_chat_gpt);
+$('#enable_chat_gpt').change(function(){
+    value = $(this).prop('checked');
+    checkChatGPTSetting(value);
+});
+function checkChatGPTSetting(value){
+    if(value == true){
+        $('#chat_gpt_key_section').removeClass('d-none');
+    }else{
+        $('#chat_gpt_key_section').addClass('d-none');
+    }
+}
+
+var test_without_key = $("input[name='test_without_key']").prop('checked');
+
+testWithoutKey(test_without_key);
+$('#test_without_key').change(function(){
+    value = $(this).prop('checked');
+    testWithoutKey(value);
+});
+function testWithoutKey(value){
+    if(value == true){
+        $('#key').addClass('d-none');
+        $("#chat_gpt_key").prop("required", false);
+    }else{
+        $('#key').removeClass('d-none');
+        $("#chat_gpt_key").prop("required", true);
     }
 }
 </script>

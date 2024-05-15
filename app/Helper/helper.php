@@ -1357,7 +1357,27 @@ function sendNotification($type,$user,$data){
     date_default_timezone_set( $admin->time_zone ?? 'UTC');
     $data['datetime'] = date('Y-m-d H:i:s');
     $role = auth()->user()->user_type;
-        $heading      = array(
+    $customerLatitude = $data['latitude']; 
+    $customerLongitude = $data['longitude'];
+    $radius = 50; 
+    $providers = \App\Models\ProviderAddressMapping::selectRaw("id, provider_id, address, latitude, longitude,
+                ( 6371 * acos( cos( radians($customerLatitude) ) *
+                cos( radians( latitude ) )
+                * cos( radians( longitude ) - radians($customerLongitude)
+                ) + sin( radians($customerLatitude) ) *
+                sin( radians( latitude ) ) )
+                ) AS distance")
+        ->having("distance", "<=", $radius)
+        ->orderBy("distance",'asc')
+        ->get();
+
+        if (!$providers->isEmpty()) {
+            $providerPlayerIds = $providers->pluck('providers.player_id')->toArray();
+
+           } else {
+            $providerPlayerIds = \App\Models\User::where('user_type', 'provider')->where('status', 1)->pluck('player_id')->toArray();     
+          }
+    $heading      = array(
         "en" =>  __('messages.post_request_title')
     );
     $content      = array(
@@ -1365,9 +1385,7 @@ function sendNotification($type,$user,$data){
     );
     $fields = array(
         'app_id' => ENV('ONESIGNAL_ONESIGNAL_APP_ID_PROVIDER'),
-        'included_segments' => array(
-            'ProviderApp'
-        ),
+        'include_player_ids' => $providerPlayerIds,
         'data' =>  array(
             'post_request_id' => $data['post_job_id'],
             'post_job_name' => $data['post_job']->title,

@@ -35,14 +35,14 @@ class PaymentController extends Controller
         $assets = ['datatable'];
         return view('paymenthistory.index', compact('pageTitle','assets','auth_user','id'));
     }
-    
+
      public function paymenthistory_index_data(DataTables $datatable,$id){
         $query = PaymentHistory::where('payment_id',$id);
-       
+
         if (auth()->user()->hasAnyRole(['admin'])) {
             $query->newquery();
         }
-        
+
         return $datatable  ->eloquent($query)
         ->editColumn('booking_id', function($payment) {
             return ($payment->booking_id != null && isset($payment->booking->service)) ? $payment->booking->service->name :'-';
@@ -51,7 +51,7 @@ class PaymentController extends Controller
             $query->whereHas('booking.service',function ($q) use($keyword){
                 $q->where('name','like','%'.$keyword.'%');
             });
-        })            
+        })
         ->editColumn('customer_id', function($payment) {
             return ($payment->booking != null && isset($payment->booking->customer)) ? $payment->booking->customer->display_name : '-';
         })
@@ -77,7 +77,7 @@ class PaymentController extends Controller
 
     public function cash_index_data(DataTables $datatable,Request $request)
     {
-        $query = Payment::query();
+        $query = Payment::query()->myPayment();
         $filter = $request->filter;
 
         if (isset($filter)) {
@@ -86,9 +86,9 @@ class PaymentController extends Controller
             }
         }
         if (auth()->user()->hasAnyRole(['admin'])) {
-            $query= $query->orderBy('id','desc')->where('payment_type','cash')->newQuery()->myPayment();
+            $query= $query->orderBy('id','desc')->where('payment_type','cash')->newQuery();
         }
-        
+
         return $datatable->eloquent($query)
             ->addColumn('check', function ($row) {
                 return '<input type="checkbox" class="form-check-input select-table-row"  id="datatable-row-'.$row->id.'"  name="datatable_ids[]" value="'.$row->id.'" onclick="dataTableRowCheck('.$row->id.')">';
@@ -109,7 +109,7 @@ class PaymentController extends Controller
                 $query->whereHas('booking.service',function ($q) use($keyword){
                     $q->where('name','like','%'.$keyword.'%');
                 });
-            }) 
+            })
             ->editColumn('customer_id', function ($payment) {
                 return view('payment.user', compact('payment'));
             })
@@ -139,7 +139,7 @@ class PaymentController extends Controller
             ->editColumn('action', function($payment) {
                 $action = set_admin_approved_cash($payment->id). ' ' .view('payment.cashaction',compact('payment'))->render();
                 return $action;
-               
+
             })
             ->addIndexColumn()->rawColumns(['check','history','action','id','status'])
             ->toJson();
@@ -149,7 +149,7 @@ class PaymentController extends Controller
 
     public function index_data(DataTables $datatable,Request $request)
     {
-        $query = Payment::query();
+        $query = Payment::query()->myPayment();
         $filter = $request->filter;
 
         if (isset($filter)) {
@@ -160,7 +160,7 @@ class PaymentController extends Controller
         if (auth()->user()->hasAnyRole(['admin'])) {
             $query->newQuery();
         }
-        
+
         return $datatable->eloquent($query)
             ->addColumn('check', function ($row) {
                 return '<input type="checkbox" class="form-check-input select-table-row"  id="datatable-row-'.$row->id.'"  name="datatable_ids[]" value="'.$row->id.'" onclick="dataTableRowCheck('.$row->id.')">';
@@ -174,7 +174,7 @@ class PaymentController extends Controller
             $query->whereHas('booking.service',function ($q) use($keyword){
                 $q->where('name','like','%'.$keyword.'%');
             });
-        })            
+        })
         ->editColumn('customer_id', function ($payment) {
             return view('payment.user', compact('payment'));
         })
@@ -186,8 +186,8 @@ class PaymentController extends Controller
         ->editColumn('payment_status', function($query) {
             return ucwords(str_replace('_', ' ', $query->payment_status));
         })
-      
-        
+
+
         ->editColumn('total_amount', function($query) {
             return getPriceFormat($query->total_amount);
         })
@@ -294,9 +294,9 @@ class PaymentController extends Controller
         }
         $document = Payment::find($id);
         $msg= __('messages.msg_fail_to_delete',['name' => __('messages.payment')] );
-        
-        if( $document!='') { 
-        
+
+        if( $document!='') {
+
             $document->delete();
             $msg= __('messages.msg_deleted',['name' => __('messages.payment')] );
         }
@@ -312,8 +312,8 @@ class PaymentController extends Controller
         $paymentdata = Payment::where('id',$id)->first();
         $parent_payment_history = PaymentHistory::where('status','pending_by_admin')
         ->where('payment_id',$id)->first();
-        
-        DB::table('consoles')->insert(['data'=> 'cash approved']);
+
+DB::table('consoles')->insert(['data'=> 'cash approved']);
 
 
         $payment_history = [
@@ -351,7 +351,7 @@ class PaymentController extends Controller
 
         $paymentdata->payment_status = 'paid';
         $paymentdata->update();
-        
+
         $msg = __('messages.approve_successfully');
         return redirect()->back()->withSuccess($msg);
     }

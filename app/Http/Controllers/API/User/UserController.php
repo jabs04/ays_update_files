@@ -273,6 +273,14 @@ class UserController extends Controller
             $service = ServiceResource::collection($service);
             $handyman_rating = HandymanRating::where('handyman_id',$id)->orderBy('id','desc')->paginate(10);
             $handyman_rating = HandymanRatingResource::collection($handyman_rating);
+            $handyman_staff = User::where('user_type','handyman')->where('provider_id',$id)->where('is_available',1)->get();
+            $handyman = UserResource::collection($handyman_staff);
+            $profile_array = [];
+            if(!empty($handyman_staff)){
+                foreach ($handyman_staff as $image) {
+                    $profile_array[] = $image->login_type !== null ? $image->social_image : getSingleMedia($image, 'profile_image',null);
+                }
+            }
         }
         $user_detail = new UserResource($user);
         if($user->user_type == 'handyman'){
@@ -283,7 +291,9 @@ class UserController extends Controller
         $response = [
             'data' => $user_detail,
             'service' => $service,
-            'handyman_rating_review' => $handyman_rating
+            'handyman_rating_review' => $handyman_rating,
+            'handyman_staff' => $handyman,
+            'handyman_image' => $profile_array,
         ];
         return comman_custom_response($response);
 

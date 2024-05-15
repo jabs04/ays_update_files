@@ -174,6 +174,9 @@ class SettingController extends Controller
                     $othersetting['admin_app_latest_version'] = $decodedata->admin_app_latest_version;
                     $othersetting['advanced_payment_setting'] = $decodedata->advanced_payment_setting;
                     $othersetting['wallet'] = $decodedata->wallet;
+                    $othersetting['enable_chat_gpt'] =  $decodedata->enable_chat_gpt;
+                    $othersetting['test_without_key'] =  $decodedata->test_without_key;
+                    $othersetting['chat_gpt_key'] =  $decodedata->chat_gpt_key;
                     // $othersetting['maintenance_mode_secret_code'] = $decodedata->maintenance_mode_secret_code;
                     
                 }
@@ -686,6 +689,9 @@ class SettingController extends Controller
     $other_setting_data['admin_app_latest_version'] =(isset($data['admin_app_latest_version']) ) ? (int)$data['admin_app_latest_version']: null;
     $other_setting_data['advanced_payment_setting'] = (isset($data['advanced_payment_setting']) && $data['advanced_payment_setting'] == 'on') ? 1 : 0;
     $other_setting_data['wallet'] = (isset($data['wallet']) && $data['wallet'] == 'on') ? 1 : 0;
+    $other_setting_data['enable_chat_gpt'] = (isset($data['enable_chat_gpt']) && $data['enable_chat_gpt'] == 'on') ? 1 : 0;
+    $other_setting_data['test_without_key'] = (isset($data['test_without_key']) && $data['test_without_key'] == 'on') ? 1 : 0;
+    $other_setting_data['chat_gpt_key'] =(isset($data['chat_gpt_key']) ) ? $data['chat_gpt_key']: null;
     // $other_setting_data['maintenance_mode_secret_code'] =(isset($data['maintenance_mode_secret_code']) ) ? $data['maintenance_mode_secret_code']: null;
 
     // if($other_setting_data['maintenance_mode']==1){

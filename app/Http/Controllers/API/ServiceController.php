@@ -85,9 +85,19 @@ class ServiceController extends Controller
         }
         
         if($request->has('provider_id') && $request->provider_id != '' ){
+       
             $service->whereHas('providers', function ($a) use ($request) {
                 $a->where('status', 1);
             });
+
+            if(default_earning_type() === 'subscription'){
+             
+                 $service->whereHas('providers', function ($a) use ($request) {
+                     $a->where('status', 1)->where('is_subscribe',1);
+                 });
+                   
+             }
+
         }else{
             if(default_earning_type() === 'subscription'){
                if(auth()->user() !== null && !auth()->user()->hasRole('admin')){
