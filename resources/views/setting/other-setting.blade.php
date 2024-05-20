@@ -220,6 +220,37 @@
     </div>
 </div> --}}
 
+<div class="row">
+    <div class="form-group col-md-12 d-flex justify-content-between">
+        <label for="enable_auto_assign" class="mb-0">{{ __('messages.notification') }}</label>
+    </div>
+</div>
+
+<div class="form-padding-box mb-3">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">  
+                <div class="custom-control custom-radio">
+                    <input type="radio" class="custom-control-input" name="notification_type" id="onesignal_notification" value="onesignal_notification" {{ !empty($othersetting->notification_type) && $othersetting->notification_type == 'onesignal_notification' ? 'checked' : '' }}>
+                    <label class="custom-control-label" for="onesignal_notification">{{ __('messages.onesignal_notification') }}</label>
+                </div>
+                <div class="text-danger mt-3">(Note: The 'OneSignal' notification method is deprecated.)</div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <div class="custom-control custom-radio">
+                    <input type="radio" class="custom-control-input" name="notification_type" id="firebase_notification" value="firebase_notification" {{ !empty($othersetting->notification_type) && $othersetting->notification_type == 'firebase_notification' ? 'checked' : '' }}>
+                    <label class="custom-control-label" for="firebase_notification">{{ __('messages.firebase_notification') }}</label>
+                </div>
+            </div>
+            <div class="form-group" id="firebase_notification_key">
+                {{ Form::text('firebase_key', null, ['class' => 'form-control', 'id' => 'firebase_key', 'placeholder' => __('messages.firebase_key')]) }}
+                <small class="help-block with-errors text-danger"></small>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 {{ Form::submit(__('messages.save'), ['class' => "btn btn-md btn-primary float-md-right"]) }}
@@ -244,8 +275,6 @@ function checkMaintenanceUpdateSetting(value){
           $("#maintenance_mode_secret_code").prop("required", false);
     }
 }
-
-
 
 
 var force_update_user_app = $("input[name='force_update_user_app']").prop('checked');
@@ -276,6 +305,7 @@ $('#force_update_provider_app').change(function(){
     value = $(this).prop('checked');
     checkProviderForceUpdateSetting(value);
 });
+
 function checkProviderForceUpdateSetting(value){
     if(value == true){
         $('#provider_verson_code').removeClass('d-none');
@@ -306,6 +336,42 @@ function checkAdminForceUpdateSetting(value){
         $('#admin_verson_code').addClass('d-none');
         $("#admin_app_latest_version").prop("required", false);
         $("#admin_app_minimum_version").prop("required", false);
+    }
+}
+
+var firebase_notification = $("input[id='firebase_notification']").prop('checked');
+
+checkfirebaseNotificationSetting(firebase_notification);
+
+$('#firebase_notification').change(function(){
+    value = $(this).prop('checked');
+    checkfirebaseNotificationSetting(value);
+});
+
+function checkfirebaseNotificationSetting(value){
+    if(value == true){
+        $('#firebase_notification_key').removeClass('d-none');
+        $("#firebase_key").prop("required", true);
+    }else{
+        $('#firebase_notification_key').addClass('d-none');
+        $("#firebase_key").prop("required", false);
+       
+    }
+}
+
+var onesignal_notification = $("input[id='onesignal_notification']").prop('checked');
+
+checkOnesignalNotificationSetting(onesignal_notification);
+
+$('#onesignal_notification').change(function(){
+    value = $(this).prop('checked');
+    checkOnesignalNotificationSetting(value);
+});
+
+function checkOnesignalNotificationSetting(value){
+    if(value == true){
+        $('#firebase_notification_key').addClass('d-none');
+        $("#firebase_key").prop("required", false); 
     }
 }
 

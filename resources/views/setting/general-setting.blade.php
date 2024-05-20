@@ -104,6 +104,7 @@
                 </select>
             </div>
         </div>
+        @hasanyrole('admin')
         <div class="form-group">
             <label for="default_language" class="col-sm-12 form-control-label">{{ __('messages.default_language') }}</label>
             <div class="col-sm-12">
@@ -114,6 +115,9 @@
                 </select>
             </div>
         </div>
+        @endhasanyrole
+        @hasanyrole('admin')
+
         <div class="form-group d-none">
             <label for="language_option" class="col-sm-12 form-control-label">{{ __('messages.language_option') }}</label>
             <div class="col-sm-12">
@@ -128,7 +132,7 @@
                 </select>
             </div>
         </div>
-
+        @endhasanyrole
         <div class="form-group">
             <label for="" class="col-sm-6 form-control-label">{{ __('messages.facebook_url') }}</label>
             <div class="col-sm-12">

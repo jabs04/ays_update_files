@@ -36,8 +36,15 @@
                                <input class="form-control" type="password" placeholder="{{ __('auth.enter_name',['name' => __('auth.login_password') ]) }}" name="password"  required autocomplete="current-password">
                                <small class="help-block with-errors text-danger"></small>
                             </div>
-                         </div>                              
+                         </div>    
+                         <div class="col-lg-12 mt-2">
+                              <button type="button" class="btn btn-outline-primary mt-2" onclick="loginFunction('demo@admin.com','12345678')">{{ __('messages.admin') }}</button>
+                              <button type="button" class="btn btn-outline-primary mt-2" onclick="loginFunction('demo@provider.com','12345678')">{{ __('messages.provider') }}</button>
+                              <button type="button" class="btn btn-outline-primary mt-2" onclick="loginFunction('demo@handyman.com','12345678')">{{ __('messages.handyman') }}</button>
+                              <button type="button" class="btn btn-outline-primary mt-2" onclick="loginFunction('demo@user.com','12345678')">{{ __('messages.user') }}</button>
+                        </div>                          
                       </div>
+                    
                       <button type="submit" class="btn btn-primary btn-block mt-2">{{ __('auth.login') }}</button>
                       <div class="col-lg-12 mt-3">
                            <p class="mb-0 text-center">{{__('auth.dont_have_account')}} <a href="{{route('auth.register')}}">{{__('auth.signup')}}</a></p>
@@ -49,4 +56,10 @@
        </div>
     </div>
  </section>
+ <script>
+    function loginFunction(username = '', password = ''){
+      document.getElementById("email").value = username;
+      document.getElementById("password").value = password;
+    }
+ </script>
 </x-guest-layout>
